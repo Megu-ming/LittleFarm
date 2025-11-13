@@ -44,11 +44,7 @@ public class PlayerController : MonoBehaviour
         Vector3 dir = (forward * _moveInput.y + right * _moveInput.x);
         if (dir.sqrMagnitude > 1f) dir.Normalize();
 
-        // 4) 캐릭터 이동 (중력/점프는 다음 스텝에서)
+        // 4) 캐릭터 이동
         _cc.Move(dir * _moveSpeed * Time.deltaTime);
-
-        // 5) 바라보는 방향: 입력 있을 때만 회전
-        if (dir.sqrMagnitude > 0.0001f)
-            transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
     }
 }
