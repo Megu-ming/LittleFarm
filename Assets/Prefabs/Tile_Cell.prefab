@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 498335379619029041}
   m_Layer: 7
   m_Name: Tile_Cell
-  m_TagString: Untagged
+  m_TagString: GroundTile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -123,5 +123,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   x: 0
-  y: 0
+  z: 0
+  tileType: 0
+  autoMask: 0
   used: 0
+  occupant: {fileID: 0}

@@ -16,20 +16,26 @@ public class GridTileDesignerEditor : Editor
         GridTileDesigner designer = (GridTileDesigner)target;
 
         // 현재 선택된 타일 머티리얼 표시
-        Material current = designer.CurrentMaterial;
-        string matName = current ? current.name : "없음";
-        EditorGUILayout.HelpBox($"현재 선택된 타일 머티리얼: {matName}", MessageType.Info);
+        TilePaintPreset current = designer.CurrentPreset;
+        string displayName = "없음";
 
-        // 머티리얼 선택 버튼
-        if(designer.tileMaterials !=null && designer.tileMaterials.Length>0)
+        if(current!=null)
         {
-            EditorGUILayout.LabelField("머티리얼 선택", EditorStyles.boldLabel);
+            string matName = current.material ? current.material.name : "머티리얼 없음";
+            displayName = $"{current.name}  ({current.tileType}, {matName})";
+        }
 
-            for(int i=0;i<designer.tileMaterials.Length; i++)
+        EditorGUILayout.HelpBox($"현재 선택된 브러시: {displayName}", MessageType.Info);
+
+        if(designer.presets !=null && designer.presets.Length>0)
+        {
+            EditorGUILayout.LabelField("브러시 프리셋 선택", EditorStyles.boldLabel);
+
+            for(int i=0;i<designer.presets.Length; i++)
             {
-                Material mat = designer.tileMaterials[i];
-                string name = mat != null ? mat.name : "빈 슬롯";
-                string label = (i == designer.selectedIndex) ? $"▶ [{i}] {name}" : $"   [{i}] {name}";
+                TilePaintPreset p = designer.presets[i];
+                string n = p != null ? (string.IsNullOrEmpty(p.name) ? $"Preset {i}" : p.name) : "빈 프리셋";
+                string label = (i == designer.selectedIndex) ? $"▶ [{i}] {n}" : $"   [{i}] {n}";
 
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(label);
@@ -66,7 +72,7 @@ public class GridTileDesignerEditor : Editor
     private void OnSceneGUI()
     {
         GridTileDesigner designer = (GridTileDesigner)target;
-        if (designer.grid == null || designer.CurrentMaterial == null)
+        if (designer.grid == null || designer.presets == null)
             return;
 
         Event e = Event.current;

@@ -131,4 +131,65 @@ public class GridManager : MonoBehaviour
 
         return true;
     }
+
+    public int GetNeighborMask(int x, int z, TileType type)
+    {
+        int mask = 0;
+
+        // 상
+        if (z + 1 < height)
+        {
+            var t = tiles[x, z + 1];
+            if (t != null && t.tileType == type)
+                mask |= 1 << 0; // Up = 1
+        }
+        // 우
+        if (x + 1 < width)
+        {
+            var t = tiles[x + 1, z];
+            if (t != null && t.tileType == type)
+                mask |= 1 << 1; // Right = 2
+        }
+        // 하
+        if (z - 1 >= 0)
+        {
+            var t = tiles[x, z - 1];
+            if (t != null && t.tileType == type)
+                mask |= 1 << 2; // Down = 4
+        }
+        // 좌
+        if (x - 1 >= 0)
+        {
+            var t = tiles[x - 1, z];
+            if (t != null && t.tileType == type)
+                mask |= 1 << 3; // Left = 8
+        }
+
+        return mask;
+    }
+
+    public void UpdateAutoTileAt(int x, int z)
+    {
+        var tile = GetTile(x, z);
+        if(tile == null)
+            return;
+
+        if(tile.tileType != TileType.Soil && tile.tileType != TileType.Path)
+        {
+             tile.autoMask = 0;
+            return;
+        }
+
+        int mask = GetNeighborMask(x, z, tile.tileType);
+        tile.autoMask = mask;
+    }
+
+    public void UpdateAutoTileAround(int x, int z)
+    {
+        UpdateAutoTileAt(x, z);
+        if (z + 1 < height) UpdateAutoTileAt(x, z + 1);
+        if (x + 1 < width)  UpdateAutoTileAt(x + 1, z);
+        if (z - 1 >= 0)     UpdateAutoTileAt(x, z - 1);
+        if (x - 1 >= 0)     UpdateAutoTileAt(x - 1, z);
+    }
 }
