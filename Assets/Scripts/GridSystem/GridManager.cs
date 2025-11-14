@@ -1,36 +1,36 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 [ExecuteAlways]
 public class GridManager : MonoBehaviour
 {
-    [Header("Å¸ÀÏ ÇÁ¸®ÆÕ")]
-    public GameObject tilePrefab;   // Tile_Cell ÇÁ¸®ÆÕ
+    [Header("íƒ€ì¼ í”„ë¦¬íŒ¹")]
+    public GameObject tilePrefab;   // Tile_Cell í”„ë¦¬íŒ¹
 
-    [Header("±×¸®µå Å©±â")]
-    public int width = 10;          // X ¹æÇâ Ä­ ¼ö
-    public int height = 10;         // Z ¹æÇâ Ä­ ¼ö
+    [Header("ê·¸ë¦¬ë“œ í¬ê¸°")]
+    public int width = 10;          // X ë°©í–¥ ì¹¸ ìˆ˜
+    public int height = 10;         // Z ë°©í–¥ ì¹¸ ìˆ˜
 
-    [Header("Ä­ °£°İ")]
-    public float cellSize = 1f;     // Ä­ ÇÏ³ªÀÇ Å©±â (À¯´Ö)
+    [Header("ì¹¸ ê°„ê²©")]
+    public float cellSize = 1f;     // ì¹¸ í•˜ë‚˜ì˜ í¬ê¸° (ìœ ë‹›)
 
-    [Header("Å×½ºÆ®¿ë ¿ÀºêÁ§Æ®")]
-    public GameObject testPrefab;
-    public int testX = 3;
-    public int testZ = 5;
-
-    // »ı¼ºÇÑ Å¸ÀÏµé ÀúÀå
+    // ìƒì„±í•œ íƒ€ì¼ë“¤ ì €ì¥
     FarmTile[,] tiles;
 
     private void OnEnable()
     {
-        GenerateGrid();
-    }
+        var existingTiles = GetComponentsInChildren<FarmTile>();
 
+        if (Application.isPlaying)
+            RefreshTilesFromScene(existingTiles);
+        else
+        {
+            if(existingTiles == null || existingTiles.Length == 0)
+                GenerateGrid();
+            else
+                RefreshTilesFromScene(existingTiles);
+        }    
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) == true)
-            BuildCube();
     }
 
     public void GenerateGrid()
@@ -38,7 +38,7 @@ public class GridManager : MonoBehaviour
         if (tilePrefab == null)
             return;
 
-        // 1) ±âÁ¸ Å¸ÀÏ Á¤¸® (FarmTile ºÙÀº ÀÚ½Ä¸¸ »èÁ¦)
+        // 1) ê¸°ì¡´ íƒ€ì¼ ì •ë¦¬ (FarmTile ë¶™ì€ ìì‹ë§Œ ì‚­ì œ)
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             Transform child = transform.GetChild(i);
@@ -51,7 +51,7 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // 2) ¹è¿­ »õ·Î ¸¸µé±â
+        // 2) ë°°ì—´ ìƒˆë¡œ ë§Œë“¤ê¸°
         tiles = new FarmTile[width, height];
 
         float offsetX = -(width - 1) * 0.5f * cellSize;
@@ -83,6 +83,24 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    private void RefreshTilesFromScene(FarmTile[] foundTiles = null)
+    {
+        if(foundTiles == null || foundTiles.Length == 0)
+            foundTiles = GetComponentsInChildren<FarmTile>();
+
+        tiles = new FarmTile[width, height];
+
+        foreach(FarmTile tile in foundTiles)
+        {
+            int x = tile.x;
+            int z = tile.z;
+
+            if (x < 0 || x >= width || z < 0 || z >= height)
+                continue;
+
+            tiles[x, z] = tile;
+        }
+    }
 
     public FarmTile GetTile(int x, int z)
     {
@@ -92,20 +110,25 @@ public class GridManager : MonoBehaviour
         return tiles[x, z];
     }
 
-    // Å×½ºÆ®¿ë
-    void BuildCube()
+    public bool WorldToGrid(Vector3 worldPos, out int x, out int z)
     {
-        if (testPrefab == null) return;
-        testX = Random.Range(0, width);
-        testZ = Random.Range(0, height);
-        FarmTile tile = GetTile(testX, testZ);
-        if (tile == null) return;
-        if (tile.used) return;
+        // GenerateGridì—ì„œ ì‚¬ìš©í•œ ê²ƒê³¼ ê°™ì€ offset ê³„ì‚°
+        float offsetX = -(width - 1) * 0.5f * cellSize;
+        float offsetZ = -(height - 1) * 0.5f * cellSize;
 
-        Vector3 pos = tile.transform.position;
-        pos.y += 0.5f; // Å¸ÀÏ À§·Î »ìÂ¦ ¿Ã¸®±â (Å¥ºê ¹İ ³ôÀÌ)
+        // ê·¸ë¦¬ë“œ ì¤‘ì‹¬(Ground.position)ì„ ê¸°ì¤€ìœ¼ë¡œ ë¡œì»¬ ì¢Œí‘œë¡œ ë³€í™˜
+        float localX = worldPos.x - transform.position.x;
+        float localZ = worldPos.z - transform.position.z;
 
-        Instantiate(testPrefab, pos, Quaternion.identity);
-        tile.used = true;
+        float fx = (localX - offsetX) / cellSize;
+        float fz = (localZ - offsetZ) / cellSize;
+
+        x = Mathf.RoundToInt(fx);
+        z = Mathf.RoundToInt(fz);
+
+        if (x < 0 || x >= width || z < 0 || z >= height)
+            return false;
+
+        return true;
     }
 }

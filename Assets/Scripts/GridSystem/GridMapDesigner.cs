@@ -2,50 +2,113 @@ using UnityEngine;
 
 public class GridMapDesigner : MonoBehaviour
 {
-    [Header("ÂüÁ¶")]
-    public GridManager grid;       // Ground¿¡ ºÙ¾îÀÖ´Â GridManager
+    [Header("ì°¸ì¡°")]
+    public GridManager grid;       // Groundì— ë¶™ì–´ìˆëŠ” GridManager
 
-    [Header("¹èÄ¡ÇÒ ÇÁ¸®ÆÕ")]
-    public GameObject prefab;      // ³ª¹«, ¹ÙÀ§, ÀÛ¹° µî
+    [Header("ë°°ì¹˜í•  í”„ë¦¬íŒ¹")]
+    public GameObject[] prefabs;      // ë‚˜ë¬´, ë°”ìœ„, ì‘ë¬¼ ë“±
 
-    [Header("¹èÄ¡ÇÒ Å¸ÀÏ ÁÂÇ¥")]
+    [Header("ë°°ì¹˜í•  í”„ë¦¬íŒ¹ ì¸ë±ìŠ¤")]
+    public int selectedIndex = 0;
+
+    [Header("ë°°ì¹˜í•  íƒ€ì¼ ì¢Œí‘œ")]
     public int x;
     public int z;
 
-    public float yOffset = 0.5f;   // Å¸ÀÏ À§·Î ¾ó¸¶³ª ¶ç¿ïÁö
+    public float yOffset = 0.5f;   // íƒ€ì¼ ìœ„ë¡œ ì–¼ë§ˆë‚˜ ë„ìš¸ì§€
 
-    // ¿¡µğÅÍ¿¡¼­ ¹öÆ°À¸·Î È£ÃâÇÒ ÇÔ¼ö
+    public GameObject CurrentPrefab
+    {
+        get 
+        {
+            if(prefabs == null || prefabs.Length == 0) return null;
+            if (selectedIndex < 0 || selectedIndex >= prefabs.Length) return null;
+            return prefabs[selectedIndex];
+        }
+    }
+
+    // ì—ë””í„°ì—ì„œ ë²„íŠ¼ìœ¼ë¡œ í˜¸ì¶œí•  í•¨ìˆ˜
     public void PlacePrefabOnGrid()
     {
-        if (grid == null || prefab == null)
+        PlacePrefabOnGridAt(x, z);
+    }
+
+    public void PlacePrefabOnGridAt(int gx, int gz)
+    {
+        if (grid == null)
         {
-            Debug.LogWarning("Grid ¶Ç´Â PrefabÀÌ ºñ¾î ÀÖ½À´Ï´Ù.");
+            Debug.LogWarning("Gridê°€ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.");
             return;
         }
 
-        FarmTile tile = grid.GetTile(x, z);
+        GameObject prefab = CurrentPrefab;
+        if(prefab == null)
+        {
+            Debug.LogWarning("ì„ íƒëœ í”„ë¦¬íŒ¹ì´ ì—†ìŠµë‹ˆë‹¤. ë°°ì—´ê³¼ ì¸ë±ìŠ¤ë¥¼ í™•ì¸í•˜ì„¸ìš”.");
+            return;
+        }
+
+        FarmTile tile = grid.GetTile(gx, gz);
         if (tile == null)
         {
-            Debug.LogWarning($"({x}, {z}) À§Ä¡¿¡ Å¸ÀÏÀÌ ¾ø½À´Ï´Ù.");
+            Debug.LogWarning($"({gx}, {gz}) ìœ„ì¹˜ì— íƒ€ì¼ì´ ì—†ìŠµë‹ˆë‹¤.");
+            return;
+        }
+
+        if(tile.used)
+        {
+            Debug.LogWarning($"({gx}, {gz}) ìœ„ì¹˜ì˜ íƒ€ì¼ì€ ì´ë¯¸ ì‚¬ìš© ì¤‘ì…ë‹ˆë‹¤.");
             return;
         }
 
         Vector3 pos = tile.transform.position;
         pos.y += yOffset;
 
-        if(tile.used == false)
-        {
-            // ¿¡µğÅÍ/ÇÃ·¹ÀÌ µÑ ´Ù¿¡¼­ µ¿ÀÛÇÏµµ·Ï ÀÏ¹İ Instantiate »ç¿ë
-            GameObject obj = Instantiate(prefab, pos, Quaternion.identity, grid.transform);
-            obj.name = $"{prefab.name}_({x},{z})";
-            tile.used = true;
-
-            Debug.Log($"ÇÁ¸®ÆÕ ¹èÄ¡: {obj.name} at ({x}, {z})");
-        }
-        else
-        {
-            // ±×³É µÎ±â
-        }
+        // ì—ë””í„°/í”Œë ˆì´ ë‘˜ ë‹¤ì—ì„œ ë™ì‘í•˜ë„ë¡ ì¼ë°˜ Instantiate ì‚¬ìš©
+        GameObject obj = Instantiate(prefab, pos, Quaternion.identity, grid.transform);
+        obj.name = $"{prefab.name}_({gx},{gz})";
         
+        PlacedObject marker = obj.GetComponent<PlacedObject>();
+        if(marker == null)
+            marker = obj.AddComponent<PlacedObject>();
+
+        marker.ownerTile = tile;
+        tile.SetOccupant(obj);
+    }
+
+    public void EraseAt(int gx, int gz)
+    {
+        if (grid == null)
+        {
+            Debug.LogWarning("Gridê°€ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.");
+            return;
+        }
+        FarmTile tile = grid.GetTile(gx, gz);
+        if (tile == null)
+        {
+            Debug.LogWarning($"({gx}, {gz}) ìœ„ì¹˜ì— íƒ€ì¼ì´ ì—†ìŠµë‹ˆë‹¤.");
+            return;
+        }
+        if (!tile.used)
+        {
+            Debug.LogWarning($"({gx}, {gz}) ìœ„ì¹˜ì˜ íƒ€ì¼ì€ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.");
+            return;
+        }
+        if(tile.occupant == null)
+        {
+            Debug.Log($"íƒ€ì¼ ({gx}, {gz}ì—ëŠ” ì˜¤ë¸Œì íŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.)");
+            tile.ClearOccupant();
+            return;
+        }
+
+        GameObject obj = tile.occupant;
+        tile.ClearOccupant();
+
+        if(Application.isPlaying)
+            Destroy(obj);
+        else
+            DestroyImmediate(obj);
+
+        Debug.Log($"íƒ€ì¼ ({gx}, {gz})ì˜ ì˜¤ë¸Œì íŠ¸ ì‚­ì œ");
     }
 }
