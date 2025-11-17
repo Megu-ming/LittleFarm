@@ -10,25 +10,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _rotationSpeed = 10f;
 
     [Header("컴포넌트 참조")]
-    [SerializeField] Transform _cameraTransform;
     [SerializeField] Animator animator;
 
     CharacterController _cc;
     Vector2 _moveInput;
+    bool _isInitialized = false;
 
-    private void Awake()
+    public void Initialize(CharacterController characterController)
     {
-        _cc = GetComponent<CharacterController>();
-    }
+        _cc = characterController;
 
-    private void Start()
-    {
-        if (!_cameraTransform && Camera.main) _cameraTransform = Camera.main.transform;
+        _isInitialized = true;
     }
 
     void Update()
     {
-        HandleMove(Time.deltaTime);
+        if (_isInitialized)
+            HandleMove(Time.deltaTime);
     }
 
     public void Move(InputAction.CallbackContext context)
@@ -51,7 +49,6 @@ public class PlayerController : MonoBehaviour
             Quaternion targetRot = Quaternion.LookRotation(inputDir, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, _rotationSpeed * deltaTime);
         }
-
         if (animator != null)
         {
             float speedParam = inputDir.magnitude;

@@ -82,6 +82,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6015795268974901497}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 23700768805769577}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
       insertIndex: -1
@@ -101,6 +104,23 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
   m_PrefabInstance: {fileID: 4178790906181380492}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6015795268974901497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836897426826843357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45bbddd118884ee4e913c86915d810db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCam: {fileID: 0}
+  characterController: {fileID: 23700768805769577}
+  controller: {fileID: 1224346708787843767}
+  action: {fileID: 1220681070877302836}
+  interaction: {fileID: 8096159823935397089}
 --- !u!143 &23700768805769577
 CharacterController:
   m_ObjectHideFlags: 0
@@ -278,7 +298,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 3
   _rotationSpeed: 10
-  _cameraTransform: {fileID: 0}
   animator: {fileID: 7535816961495815197}
 --- !u!114 &8096159823935397089
 MonoBehaviour:
@@ -292,7 +311,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87b14c2cf88b363479b74e6e1c211a1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCam: {fileID: 0}
   interactRadius: 2
   interactableMask:
     serializedVersion: 2
@@ -309,7 +327,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28b4018336b4b574990c86661dd24800, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainCam: {fileID: 0}
   _currentTool: 1
   _actionMaxDistance: 2
   _actionMask:

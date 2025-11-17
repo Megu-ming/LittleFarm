@@ -3,15 +3,19 @@ using UnityEngine.InputSystem;
 
 public class PlayerAction : MonoBehaviour
 {
-    [Header("참조")]
-    [SerializeField] Camera _mainCam;
-
     [Header("도구 상태")]
     [SerializeField] private ToolType _currentTool = ToolType.None;
 
     [Header("설정")]
     [SerializeField] float _actionMaxDistance = 2f;
     [SerializeField] LayerMask _actionMask = ~0;
+
+    Camera _mainCam;
+
+    public void Initialize(Camera cam)
+    {
+        _mainCam = cam;
+    }
 
     public void OnAction(InputAction.CallbackContext context)
     {
@@ -49,9 +53,6 @@ public class PlayerAction : MonoBehaviour
             hitPoint = hit.point,
             hitNormal = hit.normal
         };
-
         target.OnToolAction(ctx);
     }
-
-
 }

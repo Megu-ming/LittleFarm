@@ -5,13 +5,18 @@ public class GridSelector : MonoBehaviour
 {
     [SerializeField] Camera cam;       // 사용할 카메라
     [SerializeField] LayerMask tileMask; // 타일 레이어만 맞추기
+    [SerializeField] GameObject tileHighlightPrefab;
 
     FarmTile currentTile;
+    GameObject tileHighlight;
 
     private void Awake()
     {
         if (cam == null)
             cam = Camera.main;
+
+        tileHighlight = Instantiate(tileHighlightPrefab);
+        tileHighlight.SetActive(false);
     }
 
     private void Update()
@@ -31,7 +36,9 @@ public class GridSelector : MonoBehaviour
                 if (tile != currentTile)
                 {
                     currentTile = tile;
-                    Debug.Log($"마우스가 타일 ({tile.x}, {tile.z}) 위에 있습니다.");
+                    Vector3 highlightPos = new Vector3(currentTile.transform.position.x, tileHighlight.transform.position.y, currentTile.transform.position.z);
+                    tileHighlight.transform.position = highlightPos;
+                    tileHighlight.SetActive(true);
                 }
 
                 // 클릭했을 때
@@ -45,6 +52,42 @@ public class GridSelector : MonoBehaviour
         else
         {
             currentTile = null;
+            tileHighlight.SetActive (false);
         }
+    }
+
+    public FarmTile GetSelectedTile()
+    {
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Ray ray = cam.ScreenPointToRay(mousePos);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f, tileMask))
+        {
+            FarmTile tile = hit.collider.GetComponent<FarmTile>();
+            if (tile != null)
+            {
+                // 마우스가 새 타일 위로 옮겨졌을 때만 로그 출력
+                if (tile != currentTile)
+                {
+                    currentTile = tile;
+                    Vector3 highlightPos = new Vector3(currentTile.transform.position.x, tileHighlight.transform.position.y, currentTile.transform.position.z);
+                    tileHighlight.transform.position = highlightPos;
+                    tileHighlight.SetActive(true);
+                }
+
+                // 클릭했을 때
+                if (Mouse.current.leftButton.wasPressedThisFrame)
+                {
+                    Debug.Log($"타일 클릭: ({tile.x}, {tile.z})");
+                    // 나중에 여기서 작물 심기 같은 로직 호출하면 됨
+                }
+            }
+        }
+        else
+        {
+            currentTile = null;
+            tileHighlight.SetActive(false);
+        }
+        return new FarmTile();
     }
 }
