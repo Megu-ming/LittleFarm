@@ -115555,7 +115555,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8062221207074482848}
-  - component: {fileID: 2868723638570996433}
   - component: {fileID: 4776823679644668816}
   - component: {fileID: 3095271773315341842}
   m_Layer: 0
@@ -118103,18 +118102,6 @@ Transform:
   - {fileID: 6992102087900958332}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!156049354 &2868723638570996433
-Grid:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3354240964119445444}
-  m_Enabled: 1
-  m_CellSize: {x: 1, y: 1, z: 1}
-  m_CellGap: {x: 0, y: 0, z: 0}
-  m_CellLayout: 0
-  m_CellSwizzle: 1
 --- !u!114 &4776823679644668816
 MonoBehaviour:
   m_ObjectHideFlags: 0
