@@ -485,6 +485,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 628354660}
   m_CullTransparentMesh: 1
+--- !u!1 &633012392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 633012394}
+  - component: {fileID: 633012393}
+  m_Layer: 0
+  m_Name: GridMediator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &633012393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633012392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0e9123b0f425984189b26445333fff8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selector: {fileID: 0}
+  player: {fileID: 0}
+--- !u!4 &633012394
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633012392}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -22.437386, y: 1.3079307, z: -22.759195}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &683056349
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,6 +694,46 @@ PrefabInstance:
       propertyPath: _currentTool
       value: 
       objectReference: {fileID: 11400000, guid: 789aa70383963884eafb3a90d0617236, type: 2}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.size
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_ActionId
+      value: 48c43430-2f60-42b9-b769-902017f7ba3c
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_ActionName
+      value: 'Player/ToolChange[/Keyboard/tab]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2038549724}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnToolChange
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ToolChangerUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3765277520750306488, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
+      propertyPath: m_ActionEvents.Array.data[15].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3836897426826843357, guid: 3896d1a0b395b1b4c84e9db606f2c6a2, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1831,6 +1917,8 @@ GameObject:
   - component: {fileID: 2038549720}
   - component: {fileID: 2038549722}
   - component: {fileID: 2038549721}
+  - component: {fileID: 2038549723}
+  - component: {fileID: 2038549724}
   m_Layer: 5
   m_Name: UI_ToolChange
   m_TagString: Untagged
@@ -1901,6 +1989,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2038549719}
   m_CullTransparentMesh: 1
+--- !u!95 &2038549723
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038549719}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 145fcdd0f90c2e24c99a8cad94b8fee0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2038549724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038549719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c2dd0777f732fb4eb475d2f4cc9ddbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 2038549723}
 --- !u!1 &2065915048 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6950507815829827984, guid: 75eb3f9ad9779684ea015970327dd77a, type: 3}
@@ -2051,3 +2174,4 @@ SceneRoots:
   - {fileID: 1765819025}
   - {fileID: 683056353}
   - {fileID: 2134192500}
+  - {fileID: 633012394}

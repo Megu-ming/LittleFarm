@@ -17,11 +17,8 @@ public class PlayerAction : MonoBehaviour
         _mainCam = cam;
     }
 
-    public void OnAction(InputAction.CallbackContext context)
+    public void OnAction()
     {
-        if (!context.performed)
-            return;
-
         if (_currentTool == null || _currentTool.ToolType == ToolType.None)
             return;
 

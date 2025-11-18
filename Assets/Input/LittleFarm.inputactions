@@ -7,9 +7,9 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "351f2ccd-1f9f-44bf-9bec-d62ac5c5f408",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -45,6 +45,15 @@
                     "name": "Action",
                     "type": "Button",
                     "id": "a0a7cb12-b07f-4bb6-824c-a8ee83071eae",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToolChange",
+                    "type": "Button",
+                    "id": "48c43430-2f60-42b9-b769-902017f7ba3c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -280,6 +289,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3d658a03-a06c-4242-a9f7-d832b66be75e",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToolChange",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

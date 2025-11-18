@@ -10,6 +10,8 @@ public class GridSelector : MonoBehaviour
     FarmTile currentTile;
     GameObject tileHighlight;
 
+    public FarmTile CurrentTile => currentTile;
+
     private void Awake()
     {
         if (cam == null)

@@ -29,9 +29,9 @@ public class PlayerController : MonoBehaviour
             HandleMove(Time.deltaTime);
     }
 
-    public void Move(InputAction.CallbackContext context)
+    public void Move(Vector2 moveInput)
     {
-        _moveInput = context.ReadValue<Vector2>();
+        _moveInput = moveInput;
     }
 
     void HandleMove(float deltaTime)

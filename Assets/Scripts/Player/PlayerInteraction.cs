@@ -15,11 +15,8 @@ public class PlayerInteraction : MonoBehaviour
         _mainCam = cam;
     }
 
-    public void OnInteract(InputAction.CallbackContext context)
+    public void OnInteract()
     {
-        if (!context.performed)
-            return;
-
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = _mainCam.ScreenPointToRay(mousePos);
 
