@@ -7,7 +7,7 @@ public class PlayerAction : MonoBehaviour
     [SerializeField] Camera _mainCam;
 
     [Header("도구 상태")]
-    [SerializeField] private ToolType _currentTool = ToolType.None;
+    [SerializeField] ToolData _currentTool;
 
     [Header("설정")]
     [SerializeField] float _actionMaxDistance = 2f;
@@ -18,7 +18,7 @@ public class PlayerAction : MonoBehaviour
         if (!context.performed)
             return;
 
-        if (_currentTool == ToolType.None)
+        if (_currentTool == null || _currentTool.ToolType == ToolType.None)
             return;
 
         TryToolAction();
@@ -45,7 +45,8 @@ public class PlayerAction : MonoBehaviour
         var ctx = new ToolActionContext
         {
             user = this,
-            toolType = _currentTool,
+            toolType = _currentTool.ToolType,
+            power = _currentTool.Power,
             hitPoint = hit.point,
             hitNormal = hit.normal
         };
