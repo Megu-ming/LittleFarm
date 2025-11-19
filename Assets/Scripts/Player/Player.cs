@@ -15,11 +15,15 @@ public class Player : MonoBehaviour
     [SerializeField] PlayerController controller;
     [SerializeField] PlayerAction action;
     [SerializeField] PlayerInteraction interaction;
+    [SerializeField] Animator animator;
+
+    [Header("도구 착용 위치")]
+    [SerializeField] Transform rightHandPropTransform;
 
     public void Initialize()
     {
         controller.Initialize(characterController);
-        action.Initialize(gridSelector);
+        action.Initialize(gridSelector, animator);
         interaction.Initialize(gridSelector);
     }
 

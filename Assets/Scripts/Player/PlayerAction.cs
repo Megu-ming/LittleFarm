@@ -7,11 +7,13 @@ public class PlayerAction : MonoBehaviour
     [SerializeField] ToolData _currentTool;
 
     GridSelector _gridSelector;
+    Animator _animator;
 
     public ToolData CurrentTool => _currentTool;
-    public void Initialize(GridSelector gridSelector)
+    public void Initialize(GridSelector gridSelector, Animator animator)
     {
         _gridSelector = gridSelector;
+        _animator = animator;
     }
 
     public void EquipTool(ToolData tooldata)
@@ -30,8 +32,18 @@ public class PlayerAction : MonoBehaviour
             return;
         }
 
-        if (!_gridSelector.TryGetToolTarget(transform.position, _currentTool, out IToolTarget target, out Vector3 hitPoint, out Vector3 hitNormal))
+        _animator.SetTrigger("Action");
+
+        if (!_gridSelector.TryGetToolTargetFromMouseDirection(
+                transform.position,
+                _currentTool,
+                out IToolTarget target,
+                out Vector3 hitPoint,
+                out Vector3 hitNormal))
+        {
+            // 범위 밖이거나 타겟이 없음
             return;
+        }
 
         var ctx = new ToolActionContext
         {
@@ -42,6 +54,7 @@ public class PlayerAction : MonoBehaviour
             hitNormal = hitNormal
         };
 
+        
         target.OnToolAction(ctx);
     }
 }

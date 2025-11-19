@@ -38,7 +38,6 @@ public class FarmTile : MonoBehaviour
     // 점유자 해제
     public void ClearOccupant()
     {
-        Debug.Log($"({x}, {z}) 타일 프리팹 삭제");
         used = false;
         occupant = null;
     }

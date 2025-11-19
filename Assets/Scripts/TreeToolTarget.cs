@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TreeToolTarget : MonoBehaviour, IToolTarget
+public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
 {
     [Header("설정 데이터")]
     [SerializeField] float _maxHealth = 3f;
@@ -50,5 +50,10 @@ public class TreeToolTarget : MonoBehaviour, IToolTarget
 
             Instantiate(_itemDropPrefab, pos, Quaternion.identity);
         }
+    }
+
+    public void Interact(PlayerInteraction interactor)
+    {
+        Debug.Log($"[DebugInteractable] '{name}' 이(가) 상호작용 되었습니다. by {interactor.name}");
     }
 }
