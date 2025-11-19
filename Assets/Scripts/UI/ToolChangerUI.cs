@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -5,45 +6,48 @@ using UnityEngine.UI;
 public class ToolChangerUI : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] private RectTransform _wheelRoot;   // 휠 전체 패널 (비활성/활성)
-    [SerializeField] private PlayerAction _playerAction; // 도구 장비할 대상
-    [SerializeField] private Camera _uiCamera;           // Screen Space - Camera면 지정, Overlay면 비워둬도 됨
+    [SerializeField] RectTransform _wheelRoot;   // UI_ToolChange의 RectTransform
+    [SerializeField] PlayerAction _playerAction; // 도구 장비할 대상
+    [SerializeField] Camera _uiCamera;           // Overlay면 비워둬도 됨
 
     [Header("도구 슬롯")]
-    [Tooltip("6개 도구 데이터 (도끼/곡괭이/괭이 등)")]
-    [SerializeField] private ToolData[] _tools = new ToolData[6];
+    [Tooltip("6개 도구 데이터 (위에서부터 시계방향 0~5)")]
+    [SerializeField] ToolData[] _tools = new ToolData[6];
 
-    [Tooltip("각 슬롯 아이콘 이미지 (UI Image)")]
-    [SerializeField] private Image[] _slotImages = new Image[6];
+    [Tooltip("각 슬롯의 Image (Slot_0~Slot_5)")]
+    [SerializeField] Image[] _slotImages = new Image[6];
 
     [Header("비주얼")]
-    [SerializeField] private Color _normalColor = Color.white;
-    [SerializeField] private Color _highlightColor = Color.yellow;
-    [SerializeField] private float _centerDeadZone = 30f; // 휠 중앙 근처는 선택 없음
+    [SerializeField] float _normalScale = 1f;
+    [SerializeField] float _highlightScale = 1.5f;
+    [SerializeField] float _centerDeadZone = 30f; // 중앙 원(픽셀) 안은 선택 없음
 
+    private Canvas _canvas;
     private bool _isOpen = false;
     private int _currentIndex = -1;
 
     private void Awake()
     {
+        _canvas = GetComponentInParent<Canvas>();
         if (_wheelRoot != null)
             _wheelRoot.gameObject.SetActive(false);
 
-        // 아이콘 초기화
         RefreshIcons();
         HighlightSlot(-1);
     }
 
     private void Update()
     {
-        if (!_isOpen) return;
-
-        UpdateSelectionByMouse();
+        if (_isOpen)
+        {
+            UpdateSelectionByMouse();
+        }
     }
 
     /// <summary>
-    /// PlayerInput → Tab(툴휠) 액션에 연결해서 사용.
-    /// started -> 열기, canceled -> 선택 확정 후 닫기
+    /// PlayerInput → Tab 액션에 연결해서 사용.
+    /// started : 휠 열기
+    /// canceled : 선택 확정 후 닫기
     /// </summary>
     public void OnToolWheel(InputAction.CallbackContext context)
     {
@@ -60,21 +64,21 @@ public class ToolChangerUI : MonoBehaviour
 
     private void OpenWheel()
     {
-        if (_wheelRoot == null) return;
+        if (_wheelRoot == null)
+            return;
 
         _isOpen = true;
-        _currentIndex = -1;
         _wheelRoot.gameObject.SetActive(true);
 
         RefreshIcons();
-        HighlightSlot(-1);
-
-        // 필요하면: 플레이어 이동 입력 잠시 무시하는 플래그 세팅도 가능
+        // 지금 들고 있는 도구와 같은 슬롯 미리 선택
+        HighlightSlot(GetEquippedToolIndex());
     }
 
     private void CloseWheel()
     {
-        if (_wheelRoot == null) return;
+        if (_wheelRoot == null)
+            return;
 
         _isOpen = false;
         _wheelRoot.gameObject.SetActive(false);
@@ -85,22 +89,26 @@ public class ToolChangerUI : MonoBehaviour
     {
         if (_currentIndex < 0 || _currentIndex >= _tools.Length)
             return;
-
-        ToolData selected = _tools[_currentIndex];
-        if (selected == null || _playerAction == null)
+        if (_playerAction == null)
             return;
 
-        //_playerAction.EquipTool(selected);
-        Debug.Log($"[ToolWheel] 선택된 도구: {selected.DisplayName} ({selected.ToolType})");
+        ToolData selected = _tools[_currentIndex];
+        if (selected == null)
+            return;
+
+        _playerAction.EquipTool(selected);
+        Debug.Log($"[ToolChangerUI] 선택된 도구: {selected.DisplayName} ({selected.ToolType})");
     }
 
     private void RefreshIcons()
     {
-        if (_slotImages == null) return;
+        if (_slotImages == null)
+            return;
 
         for (int i = 0; i < _slotImages.Length; i++)
         {
-            if (_slotImages[i] == null) continue;
+            if (_slotImages[i] == null)
+                continue;
 
             Sprite icon = null;
             if (_tools != null && i < _tools.Length && _tools[i] != null)
@@ -113,20 +121,39 @@ public class ToolChangerUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 마우스 방향을 보고 현재 선택 슬롯 인덱스를 계산
+    /// 0 = 위, 1 = 우상단, 2 = 우하단, 3 = 아래, 4 = 좌하단, 5 = 좌상단
+    /// </summary>
     private void UpdateSelectionByMouse()
     {
         if (_wheelRoot == null || _slotImages == null || _slotImages.Length == 0)
             return;
+        if (Mouse.current == null)
+            return;
+        if (_canvas == null)
+            return;
 
+        // 1) 마우스 스크린 좌표
         Vector2 mousePos = Mouse.current.position.ReadValue();
 
-        // 휠 중심 (스크린 좌표)
-        Vector2 center = RectTransformUtility.WorldToScreenPoint(
-            _uiCamera ? _uiCamera : null,
-            _wheelRoot.position
+        // 2) 캔버스 로컬좌표로 변환
+        var canvasRect = _canvas.transform as RectTransform;
+        Camera cam = _canvas.renderMode == RenderMode.ScreenSpaceOverlay
+            ? null
+            : _canvas.worldCamera;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            mousePos,
+            cam,
+            out Vector2 localMousePos
         );
 
-        Vector2 dir = mousePos - center;
+        // 3) 휠 중심도 같은 좌표계(캔버스 로컬)에서 사용
+        Vector2 center = _wheelRoot.anchoredPosition;   // 도구변경 UI의 anchoredPosition
+
+        Vector2 dir = localMousePos - center;
         float sqrMag = dir.sqrMagnitude;
 
         // 중앙 근처면 선택 해제
@@ -136,15 +163,20 @@ public class ToolChangerUI : MonoBehaviour
             return;
         }
 
-        // 방향 → 각도(도) 0~360
+        // 4) 각도 계산
         float angleDeg = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        if (angleDeg < 0f) angleDeg += 360f;
+        if (angleDeg < 0f)
+            angleDeg += 360f;
 
-        // 6분할 (각 60도) → 0~5 인덱스
-        // 중앙을 슬롯 방향에 맞추기 위해 30도 오프셋
-        int count = _tools.Length;
-        float sectorSize = 360f / count;  // 60도
-        int index = Mathf.FloorToInt((angleDeg + sectorSize / 2f) / sectorSize) % count;
+        // "위에서 시작, 시계 방향" 각도로 변환
+        float cwFromTop = 90f - angleDeg;
+        if (cwFromTop < 0f)
+            cwFromTop += 360f;
+
+        int count = _tools.Length;          // 6
+        float sectorSize = 360f / count;    // 60도
+
+        int index = Mathf.FloorToInt((cwFromTop + sectorSize * 0.5f) / sectorSize) % count;
 
         HighlightSlot(index);
     }
@@ -153,14 +185,35 @@ public class ToolChangerUI : MonoBehaviour
     {
         _currentIndex = index;
 
-        if (_slotImages == null) return;
+        if (_slotImages == null)
+            return;
 
         for (int i = 0; i < _slotImages.Length; i++)
         {
-            if (_slotImages[i] == null) continue;
+            if (_slotImages[i] == null)
+                continue;
 
-            Color c = (i == index) ? _highlightColor : _normalColor;
-            _slotImages[i].color = c;
+            var rect = _slotImages[i].rectTransform;
+            float targetScale = (i == index) ? _highlightScale : _normalScale;
+            rect.localScale = Vector3.one * targetScale;
         }
+    }
+
+    private int GetEquippedToolIndex()
+    {
+        if (_playerAction == null || _tools == null)
+            return -1;
+
+        ToolData current = _playerAction.CurrentTool;
+        if (current == null)
+            return -1;
+
+        for (int i = 0; i < _tools.Length; i++)
+        {
+            if (_tools[i] == current)
+                return i;
+        }
+
+        return -1;
     }
 }

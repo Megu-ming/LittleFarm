@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e2841f53827075e47924925fe3538f1e, type: 3}
-  m_Name: TD_Axe_Basic
+  m_Name: TD_Waterbin_Basic
   m_EditorClassIdentifier: 
-  _id: tool_axe_basic
-  _displayName: "\uB3C4\uB07C"
+  _id: tool_waterbin_basic
+  _displayName: "\uBB3C\uBFCC\uB9AC\uAC1C"
   _icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  _toolType: 1
+  _toolType: 4
   _power: 1
   _areaSize: {x: 1, y: 1}
