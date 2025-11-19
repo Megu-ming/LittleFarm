@@ -4,33 +4,22 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("¼³Á¤")]
-    [SerializeField, Tooltip("»óÈ£ÀÛ¿ë °¡´É ¹Ý°æ")] float interactRadius = 2f;
-    [SerializeField, Tooltip("»óÈ£ÀÛ¿ë °¡´É ¹Ý°æ")] LayerMask interactableMask = ~0;
-    
-    Camera _mainCam;
+    GridSelector _gridSelector;
 
-    public void Initialize(Camera cam)
+    public void Initialize(GridSelector gridSelector)
     {
-        _mainCam = cam;
+        _gridSelector = gridSelector;
     }
 
     public void OnInteract()
     {
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = _mainCam.ScreenPointToRay(mousePos);
-
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, interactableMask))
+        if(_gridSelector == null)
+        {
+            Debug.LogWarning("[PlayerInteraction] GridSelector ì°¸ì¡°ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
+        }
 
-        IInteractable interactable = hit.collider.GetComponentInChildren<IInteractable>();
-        if (interactable == null)
-            return;
-
-        Vector3 closest = hit.collider.ClosestPoint(transform.position);
-        float dist = Vector3.Distance(transform.position, closest);
-
-        if (dist > interactRadius)
+        if (!_gridSelector.TryGetInteractTarget(transform.position, out IInteractable interactable))
             return;
 
         interactable.Interact(this);

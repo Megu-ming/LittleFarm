@@ -2,15 +2,15 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// ÀÔ·Â ÀÎ½ºÆåÅÍ ¿¬°á ´ã´ç
-/// ÇÃ·¹ÀÌ¾îÀÇ ¸ğµç ÄÄÆ÷³ÍÆ®¿¡ Initialize ´ã´ç
+/// ì…ë ¥ ì¸ìŠ¤í™í„° ì—°ê²° ë‹´ë‹¹
+/// í”Œë ˆì´ì–´ì˜ ëª¨ë“  ì»´í¬ë„ŒíŠ¸ì— Initialize ë‹´ë‹¹
 /// </summary>
 public class Player : MonoBehaviour
 {
-    [Header("¿ÜºÎ ÂüÁ¶")]
-    [SerializeField] Camera mainCam;
+    [Header("ì™¸ë¶€ ì°¸ì¡°")]
+    [SerializeField] GridSelector gridSelector;
 
-    [Header("³»ºÎ ÂüÁ¶")]
+    [Header("ë‚´ë¶€ ì°¸ì¡°")]
     [SerializeField] CharacterController characterController;
     [SerializeField] PlayerController controller;
     [SerializeField] PlayerAction action;
@@ -19,8 +19,8 @@ public class Player : MonoBehaviour
     public void Initialize()
     {
         controller.Initialize(characterController);
-        action.Initialize(mainCam);
-        interaction.Initialize(mainCam);
+        action.Initialize(gridSelector);
+        interaction.Initialize(gridSelector);
     }
 
     private void Start()

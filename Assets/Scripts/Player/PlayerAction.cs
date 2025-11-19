@@ -3,18 +3,20 @@ using UnityEngine.InputSystem;
 
 public class PlayerAction : MonoBehaviour
 {
-    [Header("µµ±¸ »óÅÂ")]
+    [Header("ë„êµ¬ ìƒíƒœ")]
     [SerializeField] ToolData _currentTool;
 
-    [Header("¼³Á¤")]
-    [SerializeField] float _actionMaxDistance = 2f;
-    [SerializeField] LayerMask _actionMask = ~0;
+    GridSelector _gridSelector;
 
-    Camera _mainCam;
-
-    public void Initialize(Camera cam)
+    public ToolData CurrentTool => _currentTool;
+    public void Initialize(GridSelector gridSelector)
     {
-        _mainCam = cam;
+        _gridSelector = gridSelector;
+    }
+
+    public void EquipTool(ToolData tooldata)
+    {
+        _currentTool = tooldata;
     }
 
     public void OnAction()
@@ -22,25 +24,13 @@ public class PlayerAction : MonoBehaviour
         if (_currentTool == null || _currentTool.ToolType == ToolType.None)
             return;
 
-        TryToolAction();
-    }
-
-    void TryToolAction()
-    {
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = _mainCam.ScreenPointToRay(mousePos);
-
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, _actionMask))
+        if(_gridSelector == null)
+        {
+            Debug.LogWarning("[PlayerAction] GridSelector ì°¸ì¡°ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
+        }
 
-        Vector3 hitPos = hit.point;
-        float dist = Vector3.Distance(transform.position, hitPos);
-
-        if(dist > _actionMaxDistance)
-            return;
-
-        IToolTarget target = hit.collider.GetComponentInParent<IToolTarget>();
-        if(target == null)
+        if (!_gridSelector.TryGetToolTarget(transform.position, _currentTool, out IToolTarget target, out Vector3 hitPoint, out Vector3 hitNormal))
             return;
 
         var ctx = new ToolActionContext
@@ -48,9 +38,10 @@ public class PlayerAction : MonoBehaviour
             user = this,
             toolType = _currentTool.ToolType,
             power = _currentTool.Power,
-            hitPoint = hit.point,
-            hitNormal = hit.normal
+            hitPoint = hitPoint,
+            hitNormal = hitNormal
         };
+
         target.OnToolAction(ctx);
     }
 }

@@ -1,95 +1,180 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class GridSelector : MonoBehaviour
 {
-    [SerializeField] Camera cam;       // »ç¿ëÇÒ Ä«¸Ş¶ó
-    [SerializeField] LayerMask tileMask; // Å¸ÀÏ ·¹ÀÌ¾î¸¸ ¸ÂÃß±â
+    [Header("ì°¸ì¡°")]
+    [SerializeField] Camera cam;                // ì‚¬ìš©í•  ì¹´ë©”ë¼
+    [SerializeField] GridManager grid;          // ê·¸ë¦¬ë“œ ì •ë³´
+    [SerializeField] Transform playerTransform; // í”Œë ˆì´ì–´ ìœ„ì¹˜
+
+    [Header("ë ˆì´ì–´ ë§ˆìŠ¤í¬")]
+    [SerializeField] LayerMask tileMask;        // FarmTileì´ ë¶™ì–´ìˆëŠ” íƒ€ì¼ ë ˆì´ì–´
+    [SerializeField] LayerMask actionMask;      // í–‰ë™ ë ˆì´ì–´
+    [SerializeField] LayerMask interactMask;    // ìƒí˜¸ì‘ìš© ë ˆì´ì–´
+
+    [Header("íƒ€ì¼ í•˜ì´ë¼ì´íŠ¸")]
     [SerializeField] GameObject tileHighlightPrefab;
+    [SerializeField] float highlightYPos = 0.05f;
 
-    FarmTile currentTile;
-    GameObject tileHighlight;
+    [Header("íƒ€ì¼ ë²”ìœ„")]
+    [SerializeField] float maxRangeInTiles = 1f;
 
-    public FarmTile CurrentTile => currentTile;
+    FarmTile _currentTile;
+    GameObject tileHighlightInstance;
+    bool _isTileInRange;
+
+    public FarmTile CurrentTile => _currentTile;
+    public bool IsTileInRange => _isTileInRange;
 
     private void Awake()
     {
         if (cam == null)
             cam = Camera.main;
 
-        tileHighlight = Instantiate(tileHighlightPrefab);
-        tileHighlight.SetActive(false);
+        if(tileHighlightPrefab!=null)
+        {
+            tileHighlightInstance = Instantiate(tileHighlightPrefab);
+            tileHighlightInstance.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        // ¸¶¿ì½º°¡ ¾ø´Â È¯°æ(ÆĞµå Àü¿ë µî) ´ëºñ
-        if (Mouse.current == null) return;
+        UpdateCurrentTileAndHighlight();
+    }
+
+    private void UpdateCurrentTileAndHighlight()
+    {
+        _currentTile = null;
+        _isTileInRange = false;
+
+        if(Mouse.current == null || cam == null || grid == null || playerTransform == null)
+        {
+            SetHighlightActive(false);
+            return;
+        }
 
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, tileMask))
+        if(Physics.Raycast(ray, out RaycastHit hit, 100f, tileMask))
         {
             FarmTile tile = hit.collider.GetComponent<FarmTile>();
-            if (tile != null)
+            if(tile!=null)
             {
-                // ¸¶¿ì½º°¡ »õ Å¸ÀÏ À§·Î ¿Å°ÜÁ³À» ¶§¸¸ ·Î±× Ãâ·Â
-                if (tile != currentTile)
+                _currentTile = tile;
+
+                if(grid.WorldToGrid(playerTransform.position, out int px, out int pz))
                 {
-                    currentTile = tile;
-                    Vector3 highlightPos = new Vector3(currentTile.transform.position.x, tileHighlight.transform.position.y, currentTile.transform.position.z);
-                    tileHighlight.transform.position = highlightPos;
-                    tileHighlight.SetActive(true);
+                    int dx = Mathf.Abs(tile.x - px);
+                    int dz = Mathf.Abs(tile.z - pz);
+                    int maxDelta = Mathf.Max(dx, dz);
+
+                    _isTileInRange = (maxDelta <= maxRangeInTiles);
+                }
+                else
+                {
+                    _isTileInRange = false;
                 }
 
-                // Å¬¸¯ÇßÀ» ¶§
-                if (Mouse.current.leftButton.wasPressedThisFrame)
+                if(tileHighlightInstance != null)
                 {
-                    Debug.Log($"Å¸ÀÏ Å¬¸¯: ({tile.x}, {tile.z})");
-                    // ³ªÁß¿¡ ¿©±â¼­ ÀÛ¹° ½É±â °°Àº ·ÎÁ÷ È£ÃâÇÏ¸é µÊ
+                    tileHighlightInstance.transform.position =
+                        tile.transform.position + Vector3.up * highlightYPos;
+                    SetHighlightActive(_isTileInRange);
                 }
+
+                return;
             }
-        }
-        else
-        {
-            currentTile = null;
-            tileHighlight.SetActive (false);
         }
     }
 
-    public FarmTile GetSelectedTile()
+    private void SetHighlightActive(bool isActive)
     {
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = cam.ScreenPointToRay(mousePos);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, tileMask))
+        if (tileHighlightInstance != null)
         {
-            FarmTile tile = hit.collider.GetComponent<FarmTile>();
-            if (tile != null)
-            {
-                // ¸¶¿ì½º°¡ »õ Å¸ÀÏ À§·Î ¿Å°ÜÁ³À» ¶§¸¸ ·Î±× Ãâ·Â
-                if (tile != currentTile)
-                {
-                    currentTile = tile;
-                    Vector3 highlightPos = new Vector3(currentTile.transform.position.x, tileHighlight.transform.position.y, currentTile.transform.position.z);
-                    tileHighlight.transform.position = highlightPos;
-                    tileHighlight.SetActive(true);
-                }
+            tileHighlightInstance.SetActive(isActive);
+        }
+    }
 
-                // Å¬¸¯ÇßÀ» ¶§
-                if (Mouse.current.leftButton.wasPressedThisFrame)
-                {
-                    Debug.Log($"Å¸ÀÏ Å¬¸¯: ({tile.x}, {tile.z})");
-                    // ³ªÁß¿¡ ¿©±â¼­ ÀÛ¹° ½É±â °°Àº ·ÎÁ÷ È£ÃâÇÏ¸é µÊ
-                }
+    /// <summary>
+    /// í”Œë ˆì´ì–´ ì•¡ì…˜ìš©. ì„ íƒëœ íƒ€ì¼ì´ ë²”ìœ„ ì•ˆì— ìˆìœ¼ë©´ ê·¸ íƒ€ì¼ ë°˜í™˜
+    /// </summary>
+    /// <param name="tile"></param>
+    /// <returns></returns>
+    public bool TryGetTileForAction(out FarmTile tile)
+    {
+        tile = (_isTileInRange ? _currentTile : null);
+        return tile != null;
+    }
+
+    /// <summary>
+    /// ë„êµ¬ ì‚¬ìš© ëŒ€ìƒ ì°¾ê¸°
+    /// íƒ€ì¼ì´ ë²”ìœ„ ì•ˆì— ìˆì„ ê²ƒ
+    /// íƒ€ì¼ occupant ë˜ëŠ” overlapSphereë¡œ IToolTargetíƒìƒ‰
+    /// </summary>
+    /// <param name="playerPos"></param>
+    /// <param name="toolData"></param>
+    /// <param name="target"></param>
+    /// <param name="hitPoint"></param>
+    /// <param name="hitNormal"></param>
+    /// <returns></returns>
+    public bool TryGetToolTarget(Vector3 playerPos, ToolData toolData, out IToolTarget target, out Vector3 hitPoint, out Vector3 hitNormal)
+    {
+        target = null;
+        hitPoint = default;
+        hitNormal = Vector3.up;
+
+        if (!TryGetTileForAction(out FarmTile tile)) return false;
+
+        if(tile.occupant !=null)
+        {
+            target = tile.occupant.GetComponentInChildren<IToolTarget>();
+            if(target!=null)
+            {
+                hitPoint = tile.occupant.transform.position;
+                return true;
             }
         }
-        else
+
+        float radius = (grid != null) ? grid.cellSize * 0.5f : 0.5f;
+        Vector3 center = tile.transform.position + Vector3.up * 0.5f;
+
+        Collider[] cols = Physics.OverlapSphere(center, radius, actionMask);
+        foreach (var col in cols)
         {
-            currentTile = null;
-            tileHighlight.SetActive(false);
+            target = col.GetComponentInParent<IToolTarget>();
+            if (target != null)
+            {
+                hitPoint = col.ClosestPoint(center);
+                hitNormal = Vector3.up;
+                return true;
+            }
         }
-        return new FarmTile();
+
+        return false;
+    }
+
+    public bool TryGetInteractTarget(Vector3 playerPos, out IInteractable interactable)
+    {
+        interactable = null;
+
+        if (!TryGetTileForAction(out FarmTile tile)) return false;
+
+        float radius = (grid != null) ? grid.cellSize * 0.5f : 0.5f;
+        Vector3 center = tile.transform.position + Vector3.up * 0.5f;
+
+        Collider[] cols = Physics.OverlapSphere(center, radius, interactMask);
+        foreach (var col in cols)
+        {
+            interactable = col.GetComponentInParent<IInteractable>();
+            if (interactable != null)
+                return true;
+        }
+
+        return false;
     }
 }
