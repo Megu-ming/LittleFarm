@@ -3,24 +3,24 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ToolData", menuName = "Game/Tool Data")]
 public class ToolData : ScriptableObject
 {
-    [Header("±âº» Á¤º¸")]
+    [Header("ê¸°ë³¸ ì •ë³´")]
     [SerializeField] string _id;
     [SerializeField] string _displayName;
     [SerializeField] Sprite _icon;
 
-    [Header("µµ±¸ Å¸ÀÔ")]
+    [Header("ë„êµ¬ íƒ€ìž…")]
     [SerializeField] GameObject _toolPrefab;
 
-    [Header("µµ±¸ Å¸ÀÔ")]
+    [Header("ë„êµ¬ íƒ€ìž…")]
     [SerializeField] ToolType _toolType = ToolType.None;
 
-    [Header("±âº» ÆÄ¿ö")]
+    [Header("ê¸°ë³¸ íŒŒì›Œ")]
     [SerializeField] float _power = 1f;
 
-    [Header("Çàµ¿ ¹üÀ§")]
+    [Header("í–‰ë™ ë²”ìœ„")]
     [SerializeField] Vector2Int _areaSize = Vector2Int.zero;
 
-    // ÀÐ±â Àü¿ë ÇÁ·ÎÆÛÆ¼
+    // ì½ê¸° ì „ìš© í”„ë¡œí¼í‹°
     public string Id => _id;
     public string DisplayName => _displayName;
     public Sprite Icon => _icon;
