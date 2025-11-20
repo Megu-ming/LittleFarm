@@ -7,12 +7,7 @@ public class ToolChangerUI : MonoBehaviour
 {
     [Header("참조")]
     [SerializeField] RectTransform _wheelRoot;   // UI_ToolChange의 RectTransform
-    [SerializeField] PlayerAction _playerAction; // 도구 장비할 대상
     [SerializeField] Camera _uiCamera;           // Overlay면 비워둬도 됨
-
-    [Header("도구 슬롯")]
-    [Tooltip("6개 도구 데이터 (위에서부터 시계방향 0~5)")]
-    [SerializeField] ToolData[] _tools = new ToolData[6];
 
     [Tooltip("각 슬롯의 Image (Slot_0~Slot_5)")]
     [SerializeField] Image[] _slotImages = new Image[6];
@@ -23,6 +18,7 @@ public class ToolChangerUI : MonoBehaviour
     [SerializeField] float _centerDeadZone = 30f; // 중앙 원(픽셀) 안은 선택 없음
 
     private Canvas _canvas;
+    Player _player;
     private bool _isOpen = false;
     private int _currentIndex = -1;
 
@@ -31,6 +27,11 @@ public class ToolChangerUI : MonoBehaviour
         _canvas = GetComponentInParent<Canvas>();
         if (_wheelRoot != null)
             _wheelRoot.gameObject.SetActive(false);
+    }
+
+    public void Initialize(Player player)
+    {
+        _player = player;
 
         RefreshIcons();
         HighlightSlot(-1);
@@ -71,8 +72,6 @@ public class ToolChangerUI : MonoBehaviour
         _wheelRoot.gameObject.SetActive(true);
 
         RefreshIcons();
-        // 지금 들고 있는 도구와 같은 슬롯 미리 선택
-        HighlightSlot(GetEquippedToolIndex());
     }
 
     private void CloseWheel()
@@ -87,16 +86,14 @@ public class ToolChangerUI : MonoBehaviour
 
     private void ConfirmSelection()
     {
-        if (_currentIndex < 0 || _currentIndex >= _tools.Length)
-            return;
-        if (_playerAction == null)
+        if (_currentIndex < 0 || _player ==null || _currentIndex >= _player.Tools.Length)
             return;
 
-        ToolData selected = _tools[_currentIndex];
+        ToolData selected = _player.Tools[_currentIndex];
         if (selected == null)
             return;
 
-        _playerAction.EquipTool(selected);
+        _player.EquipTool(selected);
         Debug.Log($"[ToolChangerUI] 선택된 도구: {selected.DisplayName} ({selected.ToolType})");
     }
 
@@ -111,9 +108,9 @@ public class ToolChangerUI : MonoBehaviour
                 continue;
 
             Sprite icon = null;
-            if (_tools != null && i < _tools.Length && _tools[i] != null)
+            if (_player.Tools != null && i < _player.Tools.Length && _player.Tools[i] != null)
             {
-                icon = _tools[i].Icon;
+                icon = _player.Tools[i].Icon;
             }
 
             _slotImages[i].sprite = icon;
@@ -173,7 +170,7 @@ public class ToolChangerUI : MonoBehaviour
         if (cwFromTop < 0f)
             cwFromTop += 360f;
 
-        int count = _tools.Length;          // 6
+        int count = _player.Tools.Length;   // 6
         float sectorSize = 360f / count;    // 60도
 
         int index = Mathf.FloorToInt((cwFromTop + sectorSize * 0.5f) / sectorSize) % count;
@@ -197,23 +194,5 @@ public class ToolChangerUI : MonoBehaviour
             float targetScale = (i == index) ? _highlightScale : _normalScale;
             rect.localScale = Vector3.one * targetScale;
         }
-    }
-
-    private int GetEquippedToolIndex()
-    {
-        if (_playerAction == null || _tools == null)
-            return -1;
-
-        ToolData current = _playerAction.CurrentTool;
-        if (current == null)
-            return -1;
-
-        for (int i = 0; i < _tools.Length; i++)
-        {
-            if (_tools[i] == current)
-                return i;
-        }
-
-        return -1;
     }
 }

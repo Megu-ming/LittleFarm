@@ -9,6 +9,9 @@ public class ToolData : ScriptableObject
     [SerializeField] Sprite _icon;
 
     [Header("도구 타입")]
+    [SerializeField] GameObject _toolPrefab;
+
+    [Header("도구 타입")]
     [SerializeField] ToolType _toolType = ToolType.None;
 
     [Header("기본 파워")]
@@ -21,6 +24,8 @@ public class ToolData : ScriptableObject
     public string Id => _id;
     public string DisplayName => _displayName;
     public Sprite Icon => _icon;
+
+    public GameObject ToolPrefab => _toolPrefab;
 
     public ToolType ToolType => _toolType;
     public float Power => _power;
