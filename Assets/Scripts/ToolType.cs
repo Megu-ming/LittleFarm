@@ -8,4 +8,5 @@ public enum ToolType
     Hoe,
     WateringCan,
     Scythe,
+    FishingRod,
 }

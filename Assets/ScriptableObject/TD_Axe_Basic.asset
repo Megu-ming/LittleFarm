@@ -19,3 +19,4 @@ MonoBehaviour:
   _toolType: 1
   _power: 1
   _areaSize: {x: 1, y: 1}
+  _triggerName: AxeAction

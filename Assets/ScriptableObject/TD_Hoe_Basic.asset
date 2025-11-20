@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: tool_Hoe_basic
   _displayName: "\uD638\uBBF8"
-  _icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  _icon: {fileID: 21300000, guid: 9f912a204ea4a514f99e463f2072f8b1, type: 3}
+  _toolPrefab: {fileID: 4621275313678140330, guid: 036899a24cb283044bc360195038f61d, type: 3}
   _toolType: 3
   _power: 1
   _areaSize: {x: 1, y: 1}
+  _triggerName: HoeAction

@@ -23,7 +23,8 @@ public class PlayerAction : MonoBehaviour
         if (isPressed == false || tool == null || tool.ToolType == ToolType.None) return;
 
         _cachedActionTile = _gridSelector != null ? _gridSelector.CurrentTile : null;
-        _animator.SetTrigger("Action");
+        if(!string.IsNullOrEmpty(tool.TriggerName))
+            _animator.SetTrigger(tool.TriggerName);
     }
 
     /// <summary>

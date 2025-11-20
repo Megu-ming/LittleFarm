@@ -15,6 +15,8 @@ MonoBehaviour:
   _id: tool_Fishing_basic
   _displayName: "\uB09A\uC2DC\uB300"
   _icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  _toolType: 0
+  _toolPrefab: {fileID: 0}
+  _toolType: 6
   _power: 1
   _areaSize: {x: 1, y: 1}
+  _triggerName: FishingAction

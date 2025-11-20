@@ -20,6 +20,9 @@ public class ToolData : ScriptableObject
     [Header("행동 범위")]
     [SerializeField] Vector2Int _areaSize = Vector2Int.zero;
 
+    [Header("애니메이션")]
+    [SerializeField] string _triggerName;
+
     // 읽기 전용 프로퍼티
     public string Id => _id;
     public string DisplayName => _displayName;
@@ -30,4 +33,5 @@ public class ToolData : ScriptableObject
     public ToolType ToolType => _toolType;
     public float Power => _power;
     public Vector2Int AreaSize => _areaSize;
+    public string TriggerName => _triggerName;
 }
