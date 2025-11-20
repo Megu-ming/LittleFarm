@@ -1,3 +1,4 @@
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
@@ -22,7 +23,7 @@ public class GridSelector : MonoBehaviour
     [Header("타일 범위")]
     [SerializeField] int maxRangeInTiles = 1;
 
-    FarmTile _currentTile;
+    [SerializeField, ReadOnly]FarmTile _currentTile;
     GameObject _tileHighlightInstance;
 
     public FarmTile CurrentTile => _currentTile;

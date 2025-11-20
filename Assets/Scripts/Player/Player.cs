@@ -17,19 +17,27 @@ public class Player : MonoBehaviour
     [SerializeField] PlayerInteraction interaction;
     [SerializeField] Animator animator;
 
-    [Header("도구 착용 위치")]
+    [Header("도구")]
+    [SerializeField] ToolData[] _tools = new ToolData[6];
     [SerializeField] Transform rightHandPropTransform;
+
+    [Header("현재 상태")]
+    [SerializeField] PlayerState currentState = PlayerState.Idle;
+
+    // 읽기 전용 프로퍼티
+    public PlayerState CurrentState => currentState;
+    public ToolData[] Tools => _tools;
+
+    public void SetState(PlayerState state)
+    {
+        currentState = state;
+    }
 
     public void Initialize()
     {
-        controller.Initialize(characterController);
+        controller.Initialize(this, characterController, animator);
         action.Initialize(gridSelector, animator);
         interaction.Initialize(gridSelector);
-    }
-
-    private void Start()
-    {
-        Initialize();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -52,9 +60,13 @@ public class Player : MonoBehaviour
 
     public void OnAction(InputAction.CallbackContext context)
     {
-        if (!context.performed)
-            return;
+        float value = context.ReadValue<float>();
+        bool isPressed = value > 0.5f;
+        action.SetActionInput(isPressed);
+    }
 
-        action.OnAction();
+    public void EquipTool(ToolData selected)
+    {
+        action.EquipTool(selected);
     }
 }

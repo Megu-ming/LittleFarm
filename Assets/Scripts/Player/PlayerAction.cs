@@ -8,6 +8,7 @@ public class PlayerAction : MonoBehaviour
 
     GridSelector _gridSelector;
     Animator _animator;
+    FarmTile _cachedActionTile;
 
     public ToolData CurrentTool => _currentTool;
     public void Initialize(GridSelector gridSelector, Animator animator)
@@ -21,29 +22,39 @@ public class PlayerAction : MonoBehaviour
         _currentTool = tooldata;
     }
 
-    public void OnAction()
+    public void SetActionInput(bool isPressed)
     {
-        if (_currentTool == null || _currentTool.ToolType == ToolType.None)
-            return;
+        if (isPressed == false || _currentTool == null || _currentTool.ToolType == ToolType.None) return;
 
-        if(_gridSelector == null)
-        {
-            Debug.LogWarning("[PlayerAction] GridSelector 참조가 없습니다.");
-            return;
-        }
-
+        _cachedActionTile = _gridSelector != null ? _gridSelector.CurrentTile : null;
         _animator.SetTrigger("Action");
+    }
 
-        if (!_gridSelector.TryGetToolTargetFromMouseDirection(
-                transform.position,
-                _currentTool,
-                out IToolTarget target,
-                out Vector3 hitPoint,
-                out Vector3 hitNormal))
+    /// <summary>
+    /// 행동 애니메이션 클립에서 호출됨
+    /// </summary>
+    /// <returns></returns>
+    public bool TryDoToolAction()
+    {
+        FarmTile tile = _cachedActionTile;
+        _cachedActionTile = null;
+
+        if (tile == null)
+            return false;
+
+        IToolTarget target = null;
+        Vector3 hitPoint = tile.transform.position;
+        Vector3 hitNormal = Vector3.up;
+
+        if(tile.occupant != null)
         {
-            // 범위 밖이거나 타겟이 없음
-            return;
+            target = tile.occupant.GetComponentInChildren<IToolTarget>();
+            if (target != null)
+                hitPoint = tile.occupant.transform.position;
         }
+
+        if (target == null)
+            return false;
 
         var ctx = new ToolActionContext
         {
@@ -53,8 +64,8 @@ public class PlayerAction : MonoBehaviour
             hitPoint = hitPoint,
             hitNormal = hitNormal
         };
-
         
         target.OnToolAction(ctx);
+        return true;
     }
 }

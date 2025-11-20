@@ -10,15 +10,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _rotationSpeed = 10f;
 
     [Header("컴포넌트 참조")]
-    [SerializeField] Animator animator;
+    [SerializeField] Player _player;
+    [SerializeField] Animator _animator;
 
     CharacterController _cc;
     Vector2 _moveInput;
     bool _isInitialized = false;
 
-    public void Initialize(CharacterController characterController)
+    public void Initialize(Player player, CharacterController characterController, Animator animator)
     {
+        _player = player;
         _cc = characterController;
+        _animator = animator;
 
         _isInitialized = true;
     }
@@ -36,6 +39,8 @@ public class PlayerController : MonoBehaviour
 
     void HandleMove(float deltaTime)
     {
+        if (_player.CurrentState == PlayerState.Acting) return;
+
         Vector3 inputDir = new Vector3(_moveInput.x, 0f, _moveInput.y);
 
         if (inputDir.sqrMagnitude>1f)
@@ -49,10 +54,10 @@ public class PlayerController : MonoBehaviour
             Quaternion targetRot = Quaternion.LookRotation(inputDir, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, _rotationSpeed * deltaTime);
         }
-        if (animator != null)
+        if (_animator != null)
         {
             float speedParam = inputDir.magnitude;
-            animator.SetFloat("Speed", speedParam);
+            _animator.SetFloat("Speed", speedParam);
         }
     }
 
