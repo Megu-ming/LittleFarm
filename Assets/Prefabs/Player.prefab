@@ -186,11 +186,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45bbddd118884ee4e913c86915d810db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCam: {fileID: 0}
+  gridSelector: {fileID: 0}
   characterController: {fileID: 23700768805769577}
   controller: {fileID: 1224346708787843767}
   action: {fileID: 1220681070877302836}
   interaction: {fileID: 8096159823935397089}
+  animator: {fileID: 7535816961495815197}
+  _tools:
+  - {fileID: 11400000, guid: 789aa70383963884eafb3a90d0617236, type: 2}
+  - {fileID: 11400000, guid: 5c74e4cc507ea1b4fb39c8563fa4fbdb, type: 2}
+  - {fileID: 11400000, guid: 897cdf7d759151a4ba7016d702977952, type: 2}
+  - {fileID: 11400000, guid: 8e4db31acb0dc924e90473aef3d43152, type: 2}
+  - {fileID: 11400000, guid: 4ed7d7fc924cc7e4db47381664481dbf, type: 2}
+  - {fileID: 11400000, guid: 0fe9ffdf839ef23459765a7cd08a4ee4, type: 2}
+  _rightHandPropTransform: {fileID: 2107507386838562530}
+  _currentToolInstance: {fileID: 0}
+  _currentToolData: {fileID: 0}
+  currentState: 0
 --- !u!143 &23700768805769577
 CharacterController:
   m_ObjectHideFlags: 0
@@ -372,7 +384,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 3
   _rotationSpeed: 10
-  animator: {fileID: 7535816961495815197}
+  _player: {fileID: 0}
+  _animator: {fileID: 0}
 --- !u!114 &8096159823935397089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,10 +398,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87b14c2cf88b363479b74e6e1c211a1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactRadius: 2
-  interactableMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &1220681070877302836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -401,11 +410,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28b4018336b4b574990c86661dd24800, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentTool: {fileID: 0}
-  _actionMaxDistance: 2
-  _actionMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!95 &7535816961495815197 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}

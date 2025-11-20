@@ -9,11 +9,11 @@ public class PlayerController : MonoBehaviour
     float _cacheMoveSpeed;
     [SerializeField] float _rotationSpeed = 10f;
 
-    [Header("컴포넌트 참조")]
-    [SerializeField] Player _player;
-    [SerializeField] Animator _animator;
-
+    // 참조
+    Player _player;
+    Animator _animator;
     CharacterController _cc;
+
     Vector2 _moveInput;
     bool _isInitialized = false;
 

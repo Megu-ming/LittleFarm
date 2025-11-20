@@ -17,14 +17,40 @@ public class PlayerAction : MonoBehaviour
         _animator = animator;
     }
 
-    public void SetActionInput(bool isPressed)
+    public void Action(bool isPressed)
     {
+        if (_player.CurrentState == PlayerState.Acting) return;
+
         var tool = CurrentTool;
         if (isPressed == false || tool == null || tool.ToolType == ToolType.None) return;
 
         _cachedActionTile = _gridSelector != null ? _gridSelector.CurrentTile : null;
-        if(!string.IsNullOrEmpty(tool.TriggerName))
+        FaceActionTarget();
+        if (!string.IsNullOrEmpty(tool.TriggerName))
             _animator.SetTrigger(tool.TriggerName);
+    }
+
+    /// <summary>
+    /// 캐싱된 타일(또는 현재 타일) 방향을 바라보게 회전
+    /// </summary>
+    private void FaceActionTarget()
+    {
+        // 우선 캐싱된 타일을 쓰고, 없으면 현재 타일 사용
+        FarmTile tile = _cachedActionTile;
+        if (tile == null && _gridSelector != null)
+            tile = _gridSelector.CurrentTile;
+
+        if (tile == null)
+            return;
+
+        Vector3 targetPos = tile.transform.position;
+        Vector3 dir = targetPos - transform.position;
+        dir.y = 0f; // Y축 무시하고 수평 회전만
+
+        if (dir.sqrMagnitude < 0.0001f)
+            return;
+
+        transform.rotation = Quaternion.LookRotation(dir.normalized);
     }
 
     /// <summary>

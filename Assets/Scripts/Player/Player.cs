@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
     {
         float value = context.ReadValue<float>();
         bool isPressed = value > 0.5f;
-        action.SetActionInput(isPressed);
+        action.Action(isPressed);
     }
 
     public void EquipTool(ToolData selected)

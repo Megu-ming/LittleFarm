@@ -22,16 +22,13 @@ public class ToolChangerUI : MonoBehaviour
     private bool _isOpen = false;
     private int _currentIndex = -1;
 
-    private void Awake()
-    {
-        _canvas = GetComponentInParent<Canvas>();
-        if (_wheelRoot != null)
-            _wheelRoot.gameObject.SetActive(false);
-    }
-
     public void Initialize(Player player)
     {
         _player = player;
+
+        _canvas = GetComponentInParent<Canvas>();
+        if (_wheelRoot != null)
+            _wheelRoot.gameObject.SetActive(false);
 
         RefreshIcons();
         HighlightSlot(-1);
