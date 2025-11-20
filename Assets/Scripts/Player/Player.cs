@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
 
     public void Initialize()
     {
-        controller.Initialize(this, characterController, animator);
+        controller.Initialize(this, characterController, animator, gridSelector);
         action.Initialize(this, gridSelector, animator);
         interaction.Initialize(gridSelector);
     }

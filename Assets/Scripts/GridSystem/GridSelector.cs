@@ -25,8 +25,10 @@ public class GridSelector : MonoBehaviour
 
     [SerializeField, ReadOnly]FarmTile _currentTile;
     GameObject _tileHighlightInstance;
+    bool isFocus;
 
     public FarmTile CurrentTile => _currentTile;
+    public bool SetFocus(bool value) => isFocus = value;
 
     private void Awake()
     {
@@ -43,17 +45,23 @@ public class GridSelector : MonoBehaviour
     private void Update()
     {
         UpdateCurrentTileFromMouseDirection();
+
+        if (isFocus)
+        {
+            if (_tileHighlightInstance != null)
+            {
+                _tileHighlightInstance.transform.position =
+                    _currentTile.transform.position + Vector3.up * highlightYPos;
+                SetHighlightActive(true);
+            }
+        }
+        else
+            SetHighlightActive(false);
     }
 
     private void UpdateCurrentTileFromMouseDirection()
     {
         _currentTile = null;
-
-        if(Mouse.current == null || cam == null || grid == null || player == null)
-        {
-            SetHighlightActive(false);
-            return;
-        }
 
         if (!TryGetTileFromMouseDirection(player.position, out FarmTile tile))
         {
@@ -61,13 +69,6 @@ public class GridSelector : MonoBehaviour
             return;
         }
         _currentTile = tile;
-
-        if (_tileHighlightInstance != null)
-        {
-            _tileHighlightInstance.transform.position =
-                tile.transform.position + Vector3.up * highlightYPos;
-            SetHighlightActive(true);
-        }
     }
 
     private void SetHighlightActive(bool isActive)

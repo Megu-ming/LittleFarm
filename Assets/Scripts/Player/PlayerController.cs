@@ -13,15 +13,17 @@ public class PlayerController : MonoBehaviour
     Player _player;
     Animator _animator;
     CharacterController _cc;
+    GridSelector _gridSeletor;
 
     Vector2 _moveInput;
     bool _isInitialized = false;
 
-    public void Initialize(Player player, CharacterController characterController, Animator animator)
+    public void Initialize(Player player, CharacterController characterController, Animator animator, GridSelector gridSelector)
     {
         _player = player;
         _cc = characterController;
         _animator = animator;
+        _gridSeletor = gridSelector;
 
         _isInitialized = true;
     }
@@ -66,10 +68,14 @@ public class PlayerController : MonoBehaviour
         if (context.started)
         {
             _cacheMoveSpeed = _moveSpeed;
-            _moveSpeed *= 0.5f; 
+            _moveSpeed *= 0.5f;
+            _gridSeletor.SetFocus(true);
         }
 
         if (context.canceled)
+        {
             _moveSpeed = _cacheMoveSpeed;
+            _gridSeletor.SetFocus(false);
+        }
     }
 }
