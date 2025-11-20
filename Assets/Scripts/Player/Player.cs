@@ -19,7 +19,11 @@ public class Player : MonoBehaviour
 
     [Header("도구")]
     [SerializeField] ToolData[] _tools = new ToolData[6];
-    [SerializeField] Transform rightHandPropTransform;
+    [Tooltip("도구를 들고 있는 오른손 트랜스폼")]
+    [SerializeField] Transform _rightHandPropTransform;
+    [Tooltip("현재 들고 있는 도구")]
+    [SerializeField] GameObject _currentToolInstance;
+    [SerializeField] ToolData _currentToolData;
 
     [Header("현재 상태")]
     [SerializeField] PlayerState currentState = PlayerState.Idle;
@@ -27,6 +31,7 @@ public class Player : MonoBehaviour
     // 읽기 전용 프로퍼티
     public PlayerState CurrentState => currentState;
     public ToolData[] Tools => _tools;
+    public ToolData CurrentToolData => _currentToolData;
 
     public void SetState(PlayerState state)
     {
@@ -36,7 +41,7 @@ public class Player : MonoBehaviour
     public void Initialize()
     {
         controller.Initialize(this, characterController, animator);
-        action.Initialize(gridSelector, animator);
+        action.Initialize(this, gridSelector, animator);
         interaction.Initialize(gridSelector);
     }
 
@@ -67,6 +72,26 @@ public class Player : MonoBehaviour
 
     public void EquipTool(ToolData selected)
     {
-        action.EquipTool(selected);
+        if (_currentToolInstance != null)
+        {
+            Destroy(_currentToolInstance);
+            _currentToolInstance = null;
+        }
+
+        _currentToolData = selected;
+
+        if (_currentToolData == null)
+            return;
+
+        if (_currentToolData.ToolPrefab == null)
+            return;
+
+        if(_rightHandPropTransform == null)
+        {
+            Debug.LogWarning("[Player] RightHandPropTransform이 비어 있습니다.");
+            return;
+        }
+
+        _currentToolInstance = Instantiate(_currentToolData.ToolPrefab, _rightHandPropTransform);
     }
 }
