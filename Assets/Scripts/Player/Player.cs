@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 {
     [Header("외부 참조")]
     [SerializeField] GridSelector gridSelector;
+    [SerializeField] InventoryUI inventoryUI;
 
     [Header("내부 참조")]
     [SerializeField] CharacterController characterController;
@@ -38,11 +39,13 @@ public class Player : MonoBehaviour
         currentState = state;
     }
 
-    public void Initialize()
+    public void Initialize(InventoryUI inventoryUI)
     {
         controller.Initialize(this, characterController, animator, gridSelector);
         action.Initialize(this, gridSelector, animator);
         interaction.Initialize(gridSelector);
+
+        this.inventoryUI = inventoryUI;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -68,6 +71,13 @@ public class Player : MonoBehaviour
         float value = context.ReadValue<float>();
         bool isPressed = value > 0.5f;
         action.Action(isPressed);
+    }
+
+    public void OnInfo(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+        if (inventoryUI != null)
+            inventoryUI.Toggle();
     }
 
     public void EquipTool(ToolData selected)
