@@ -5,15 +5,18 @@ using System.IO;
 
 public class IconCaptureWindow : EditorWindow
 {
-    [Header("¾ÆÀÌÄÜ Ä¸ÃÄ ¼³Á¤")]
+    [Header("ì•„ì´ì½˜ ìº¡ì³ ì„¤ì •")]
     public Camera iconCamera;                 // IconCamera
     public RenderTexture renderTexture;       // RT_ItemIcon
-    public GameObject prefabToCapture;        // Ä¸ÃÄÇÒ ÇÁ¸®ÆÕ
+    public GameObject prefabToCapture;        // ìº¡ì³í•  í”„ë¦¬íŒ¹
 
     public int iconSize = 256;
-    public string saveFolder = "Assets/Arts/ItemIcons"; // PNG ÀúÀå Æú´õ
+    public string saveFolder = "Assets/Resources/ItemIcons"; // PNG ì €ì¥ í´ë”
 
-    public Vector3 modelEuler = Vector3.zero;
+    public float orbitYaw = 45f;  // Yì¶• íšŒì „ (ì¢Œìš°)
+    public float orbitPitch = 20f;  // Xì¶• íšŒì „ (ìœ„/ì•„ë˜)
+    public float distanceFactor = 2.0f; // ëª¨ë¸ ë°˜ê²½ * distanceFactor ë§Œí¼ ë–¨ì–´ì§„ ê³³ì— ì¹´ë©”ë¼\
+    public float orbitRoll = 0f;    // Zì¶• íšŒì „ (ì‹œê³„/ë°˜ì‹œê³„)
 
     GameObject _tempInstance;
 
@@ -27,7 +30,7 @@ public class IconCaptureWindow : EditorWindow
 
     void OnGUI()
     {
-        GUILayout.Label("¾ÆÀÌÅÛ ¾ÆÀÌÄÜ Ä¸ÃÄ", EditorStyles.boldLabel);
+        GUILayout.Label("ì•„ì´í…œ ì•„ì´ì½˜ ìº¡ì³", EditorStyles.boldLabel);
 
         EditorGUI.BeginChangeCheck();
 
@@ -38,11 +41,14 @@ public class IconCaptureWindow : EditorWindow
         iconSize = EditorGUILayout.IntField("Icon Size", iconSize);
         saveFolder = EditorGUILayout.TextField("Save Folder", saveFolder);
 
-        modelEuler = EditorGUILayout.Vector3Field("Model Rotation (Euler)", modelEuler);
+        orbitYaw = EditorGUILayout.Slider("Yaw (Y íšŒì „)", orbitYaw, -180f, 180f);
+        orbitPitch = EditorGUILayout.Slider("Pitch (X íšŒì „)", orbitPitch, -80f, 80f);
+        distanceFactor = EditorGUILayout.Slider("Distance Factor", distanceFactor, 1.0f, 4.0f);
+        orbitRoll = EditorGUILayout.Slider("Roll (Z íšŒì „)", orbitRoll, -180f, 180f);
 
         bool changedByFields = EditorGUI.EndChangeCheck();
 
-        if (GUILayout.Button("¼±ÅÃµÈ Prefab ÀÚµ¿ ÇÒ´ç"))
+        if (GUILayout.Button("ì„ íƒëœ Prefab ìë™ í• ë‹¹"))
         {
             var obj = Selection.activeObject as GameObject;
             if (obj != null)
@@ -56,65 +62,65 @@ public class IconCaptureWindow : EditorWindow
             if (iconCamera != null && renderTexture != null && prefabToCapture != null)
             {
                 RenderToRenderTexture();
-                Repaint(); // Ã¢ ´Ù½Ã ±×¸®±â
+                Repaint(); // ì°½ ë‹¤ì‹œ ê·¸ë¦¬ê¸°
             }
         }
 
         GUILayout.Space(10);
 
-        // ¦¡¦¡¦¡¦¡¦¡ ¹Ì¸®º¸±â ¿µ¿ª ¦¡¦¡¦¡¦¡¦¡
-        GUILayout.Label("¹Ì¸®º¸±â", EditorStyles.boldLabel);
+        // â”€â”€â”€â”€â”€ ë¯¸ë¦¬ë³´ê¸° ì˜ì—­ â”€â”€â”€â”€â”€
+        GUILayout.Label("ë¯¸ë¦¬ë³´ê¸°", EditorStyles.boldLabel);
 
         Rect previewRect = GUILayoutUtility.GetRect(PreviewSize, PreviewSize, GUILayout.ExpandWidth(false));
-        // ¹è°æ»ö
+        // ë°°ê²½ìƒ‰
         EditorGUI.DrawRect(previewRect, new Color(0.15f, 0.15f, 0.15f, 1f));
 
         if (renderTexture != null)
         {
-            // RT ³»¿ëÀ» Åø¿¡ ±×´ë·Î ±×¸®±â
+            // RT ë‚´ìš©ì„ íˆ´ì— ê·¸ëŒ€ë¡œ ê·¸ë¦¬ê¸°
             EditorGUI.DrawPreviewTexture(previewRect, renderTexture, null, ScaleMode.ScaleToFit);
         }
         else
         {
-            GUI.Label(previewRect, "RenderTexture ¾øÀ½", EditorStyles.centeredGreyMiniLabel);
+            GUI.Label(previewRect, "RenderTexture ì—†ìŒ", EditorStyles.centeredGreyMiniLabel);
         }
 
         GUILayout.Space(10);
 
-        // ¦¡¦¡¦¡¦¡¦¡ ¹öÆ°µé ¦¡¦¡¦¡¦¡¦¡
+        // â”€â”€â”€â”€â”€ ë²„íŠ¼ë“¤ â”€â”€â”€â”€â”€
         using (new GUILayout.HorizontalScope())
         {
-            if (GUILayout.Button("¹Ì¸®º¸±â °»½Å"))
+            if (GUILayout.Button("ë¯¸ë¦¬ë³´ê¸° ê°±ì‹ "))
             {
-                RenderToRenderTexture(); // RT¸¸ »õ·Î ±×¸®±â
+                RenderToRenderTexture(); // RTë§Œ ìƒˆë¡œ ê·¸ë¦¬ê¸°
             }
 
-            if (GUILayout.Button("¾ÆÀÌÄÜ Ä¸ÃÄÇÏ±â"))
+            if (GUILayout.Button("ì•„ì´ì½˜ ìº¡ì³í•˜ê¸°"))
             {
-                CaptureIcon(); // RT ·»´õ + PNG ÀúÀå
+                CaptureIcon(); // RT ë Œë” + PNG ì €ì¥
             }
         }
     }
 
     /// <summary>
-    /// ÇÁ¸®ÆÕÀ» ÀÓ½Ã ÀÎ½ºÅÏ½º·Î ¸¸µé°í, Ä«¸Ş¶ó·Î RenderTexture¿¡ ·»´õ¸¸ ÇÔ.
-    /// (µğ½ºÅ© ÀúÀåÀº ¾È ÇÔ)
+    /// í”„ë¦¬íŒ¹ì„ ì„ì‹œ ì¸ìŠ¤í„´ìŠ¤ë¡œ ë§Œë“¤ê³ , ì¹´ë©”ë¼ë¡œ RenderTextureì— ë Œë”ë§Œ í•¨.
+    /// (ë””ìŠ¤í¬ ì €ì¥ì€ ì•ˆ í•¨)
     /// </summary>
     void RenderToRenderTexture()
     {
         if (iconCamera == null || renderTexture == null || prefabToCapture == null)
         {
-            Debug.LogError("[IconCapture] Camera / RenderTexture / Prefab Áß ºüÁø °Ô ÀÖ½À´Ï´Ù.");
+            Debug.LogError("[IconCapture] Camera / RenderTexture / Prefab ì¤‘ ë¹ ì§„ ê²Œ ìˆìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // 1) ÀÓ½Ã ÀÎ½ºÅÏ½º »ı¼º
+        // 1) ì„ì‹œ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
         _tempInstance = (GameObject)PrefabUtility.InstantiatePrefab(prefabToCapture);
         _tempInstance.transform.position = Vector3.zero;
-        _tempInstance.transform.rotation = Quaternion.Euler(modelEuler);
+        _tempInstance.transform.rotation = Quaternion.identity;
         _tempInstance.transform.localScale = Vector3.one;
 
-        // 2) ¸ğµ¨ bounds °è»êÇØ¼­ Ä«¸Ş¶ó À§Ä¡/»çÀÌÁî ÀÚµ¿ Á¶Àı
+        // 2) ëª¨ë¸ bounds ê³„ì‚°í•´ì„œ ì¹´ë©”ë¼ ìœ„ì¹˜/ì‚¬ì´ì¦ˆ ìë™ ì¡°ì ˆ
         var renderers = _tempInstance.GetComponentsInChildren<Renderer>();
         if (renderers.Length > 0)
         {
@@ -124,25 +130,37 @@ public class IconCaptureWindow : EditorWindow
 
             Vector3 center = bounds.center;
             float radius = bounds.extents.magnitude;
+            if (radius < 0.001f) radius = 0.5f;
 
-            // Ä«¸Ş¶ó°¡ Z- ¹æÇâ¿¡¼­ ¹Ù¶óº»´Ù°í °¡Á¤ (¿øÇÏ¸é IconCameraÀÇ rotationÀ» ¹Ù²ãµµ µÊ)
-            iconCamera.transform.position = center + new Vector3(0, 0, -radius * 2f);
-            iconCamera.transform.LookAt(center);
+            // yaw/pitchë¡œ "ëª¨ë¸ì„ ë°”ë¼ë³´ëŠ” ë°©í–¥" ê³„ì‚°
+            Quaternion orbitRot = Quaternion.Euler(orbitPitch, orbitYaw, 0f);
+            Vector3 dir = orbitRot * Vector3.forward; // ì¹´ë©”ë¼ â†’ ëª¨ë¸ ë°©í–¥
 
+            float distance = radius * distanceFactor;
+
+            // ê¸°ë³¸ ì¹´ë©”ë¼ ìœ„ì¹˜ & LookAt
+            Vector3 camPos = center - dir * distance;
+            iconCamera.transform.position = camPos;
+            iconCamera.transform.LookAt(center); // ì—¬ê¸°ì„œ upì€ ê¸°ë³¸ (0,1,0)
+
+            // â˜… ì—¬ê¸°ì„œ roll ì¶”ê°€: ì¹´ë©”ë¼ ìì‹ ì˜ forward ì¶• ê¸°ì¤€ íšŒì „
+            iconCamera.transform.Rotate(Vector3.forward, orbitRoll, Space.Self);
+
+            // ì˜¤ì˜ ì‚¬ì´ì¦ˆ ë§ì¶”ê¸°
             if (iconCamera.orthographic)
             {
                 float maxExtent = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z);
-                iconCamera.orthographicSize = maxExtent * 1.3f; // ¿©À¯ Á¶±İ
+                iconCamera.orthographicSize = maxExtent * 1.3f;
             }
             else
             {
                 float fov = iconCamera.fieldOfView;
                 float dist = radius / Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
-                iconCamera.transform.position = center - iconCamera.transform.forward * dist * 1.3f;
+                iconCamera.transform.position = center - iconCamera.transform.forward * dist * distanceFactor;
             }
         }
 
-        // 3) Ä«¸Ş¶ó ¡æ RenderTexture·Î ·»´õ
+        // 3) ì¹´ë©”ë¼ â†’ RenderTextureë¡œ ë Œë”
         var prevRT = iconCamera.targetTexture;
         iconCamera.targetTexture = renderTexture;
 
@@ -150,7 +168,7 @@ public class IconCaptureWindow : EditorWindow
 
         iconCamera.targetTexture = prevRT;
 
-        // 4) ÀÓ½Ã ÀÎ½ºÅÏ½º Á¤¸®
+        // 4) ì„ì‹œ ì¸ìŠ¤í„´ìŠ¤ ì •ë¦¬
         if (_tempInstance != null)
             DestroyImmediate(_tempInstance);
     }
@@ -160,79 +178,34 @@ public class IconCaptureWindow : EditorWindow
     {
         if (iconCamera == null || renderTexture == null || prefabToCapture == null)
         {
-            Debug.LogError("[IconCapture] Camera / RenderTexture / Prefab Áß ºüÁø °Ô ÀÖ½À´Ï´Ù.");
+            Debug.LogError("[IconCapture] Camera / RenderTexture / Prefab ì¤‘ ë¹ ì§„ ê²Œ ìˆìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // 1) ÀÓ½Ã·Î ÇÁ¸®ÆÕ ÀÎ½ºÅÏ½º »ı¼º
-        _tempInstance = (GameObject)PrefabUtility.InstantiatePrefab(prefabToCapture);
-        _tempInstance.transform.position = Vector3.zero;
-        _tempInstance.transform.rotation = Quaternion.Euler(modelEuler);
-        _tempInstance.transform.localScale = Vector3.one;
+        // ğŸ”¹ ë¯¸ë¦¬ë³´ê¸°ì™€ ì™„ì „íˆ ê°™ì€ ì„¸íŒ…ìœ¼ë¡œ í•œ ë²ˆ ë” ë Œë”
+        RenderToRenderTexture();
 
-        // ÇÊ¿äÇÏ¸é ¿©±â¼­ bounds °è»êÇØ¼­ Ä«¸Ş¶ó À§Ä¡¸¦ »ìÂ¦ Á¶Á¤ÇØµµ µÊ
-        // ¸ğµç Renderer bounds ÇÕÄ¡±â
-        var renderers = _tempInstance.GetComponentsInChildren<Renderer>();
-        if (renderers.Length > 0)
-        {
-            Bounds bounds = renderers[0].bounds;
-            for (int i = 1; i < renderers.Length; i++)
-                bounds.Encapsulate(renderers[i].bounds);
-
-            Vector3 center = bounds.center;
-            float radius = bounds.extents.magnitude; // ´ë·«ÀûÀÎ Å©±â
-
-            // Ä«¸Ş¶ó°¡ Á¤¸é¿¡¼­ º»´Ù°í °¡Á¤ (Z-·Î º¸´Â °æ¿ì)
-            // Ä«¸Ş¶ó°¡ ´Ù¸¥ ¹æÇâÀ» º¸°Ô ÇÏ°í ½ÍÀ¸¸é forward / up¸¸ Á¶Á¤ÇÏ¸é µÊ
-            iconCamera.transform.position = center + new Vector3(0, 0, -radius * 2f);
-            iconCamera.transform.LookAt(center);
-
-            if (iconCamera.orthographic)
-            {
-                // ¿À½î Ä«¸Ş¶óÀÏ ¶§ È­¸é¿¡ ²Ë Â÷°Ô
-                float maxExtent = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z);
-                iconCamera.orthographicSize = maxExtent * 1.3f; // ¿©À¯ 30%
-            }
-            else
-            {
-                // ÆÛ½º Ä«¸Ş¶óÀÏ ¶§ °Å¸® °è»ê (ÇÊ¿äÇÏ¸é)
-                float fov = iconCamera.fieldOfView;
-                float dist = radius / Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
-                iconCamera.transform.position = center - iconCamera.transform.forward * dist * 1.3f;
-            }
-        }
-        // Áö±İÀº IconScene¿¡¼­ Ä«¸Ş¶ó/ÇÁ¸®ÆÕ À§Ä¡¸¦ ´ëÃæ ¸ÂÃçµÎ°í ¾²´Â ¹æ½Ä
-
-        // 2) Ä«¸Ş¶ó¿¡ RenderTexture ¼¼ÆÃ
-        var prevRT = iconCamera.targetTexture;
-        iconCamera.targetTexture = renderTexture;
-
-        // 3) ·»´õ¸µ
-        iconCamera.Render();
-
-        // 4) RenderTexture ¡æ Texture2D·Î ÀĞ±â
+        // ğŸ”¹ RenderTexture â†’ Texture2D
         RenderTexture.active = renderTexture;
         Texture2D tex = new Texture2D(iconSize, iconSize, TextureFormat.RGBA32, false);
         tex.ReadPixels(new Rect(0, 0, iconSize, iconSize), 0, 0);
         tex.Apply();
-
-        iconCamera.targetTexture = prevRT;
         RenderTexture.active = null;
 
-        // 5) PNG·Î ÀúÀå
+        // ğŸ”¹ PNG ì €ì¥
         if (!Directory.Exists(saveFolder))
         {
             Directory.CreateDirectory(saveFolder);
         }
 
-        string fileName = prefabToCapture.name + "_icon.png";
+        string fileName = "ICON_" + prefabToCapture.name + ".png";
         string path = Path.Combine(saveFolder, fileName);
 
         byte[] png = tex.EncodeToPNG();
         File.WriteAllBytes(path, png);
         Debug.Log($"[IconCapture] Saved icon: {path}");
 
-        // 6) ¿¡¼Â DB °»½Å + Sprite·Î ÀÓÆ÷Æ® ¼³Á¤
+        // ğŸ”¹ ì—ì…‹ DB ê°±ì‹  + Sprite ì„í¬íŠ¸
         AssetDatabase.ImportAsset(path);
         var importer = (TextureImporter)TextureImporter.GetAtPath(path);
         if (importer != null)
@@ -242,14 +215,9 @@ public class IconCaptureWindow : EditorWindow
             importer.SaveAndReimport();
         }
 
-        // ÀÓ½Ã ÀÎ½ºÅÏ½º Á¤¸®
-        if (_tempInstance != null)
-        {
-            DestroyImmediate(_tempInstance);
-        }
-
-        // ¸Ş¸ğ¸® Á¤¸®
+        // ë©”ëª¨ë¦¬ ì •ë¦¬
         Object.DestroyImmediate(tex);
     }
+
 }
 #endif

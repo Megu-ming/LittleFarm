@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameInitializer : MonoBehaviour
 {
-    public static GameInitializer Instance;
+    private static GameInitializer instance;
 
     [Header("주요 객체 참조")]
     [SerializeField] Player _player;
@@ -15,9 +15,32 @@ public class GameInitializer : MonoBehaviour
 
     public ItemDatabase Database => _database;
 
+    public static GameInitializer Instance
+    {
+        get
+        {
+            if(instance == null)
+            {
+                return null;
+            }
+            return instance;
+        }
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+            Destroy(this.gameObject);
+    }
+
     private void Start()
     {
-        Instance = this;
+        instance = this;
 
         _database.Initialize();
         _inventory.Initialize(_database);

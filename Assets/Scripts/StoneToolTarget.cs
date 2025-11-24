@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
+public class StoneToolTarget : MonoBehaviour, IToolTarget, IInteractable
 {
     [Header("설정 데이터")]
     [SerializeField] float _maxHealth = 3f;
     [SerializeField] bool _destroyOnZero = true;
 
     [Header("드랍 설정")]
-    [SerializeField] string _dropItemKey = "WOOD";
+    [SerializeField] string _dropItemKey = "STONE";
     [SerializeField] int _dropCountMin = 1;
     [SerializeField] int _dropCountMax = 3;
     [SerializeField] Vector3 _dropOffset = new Vector3(0f, 0.5f, 0f);
@@ -26,18 +26,18 @@ public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
 
     public void OnToolAction(ToolActionContext context)
     {
-        if(context.toolType == ToolType.Axe)
+        if(context.toolType == ToolType.Pickaxe)
         {
             _currentHealth -= context.power;
-            _animator.SetTrigger("Hit");
-            Debug.Log($"[Tree] {name} 맞음! 남은 HP {_currentHealth}");
+            //_animator.SetTrigger("Hit");
+            Debug.Log($"[Stone] {name} 맞음! 남은 HP {_currentHealth}");
 
             if(_currentHealth <=0)
             {
-                //DropItems();
+                DropItems();
                 if(_destroyOnZero)
                 {
-                    _animator.SetTrigger("Fallen");
+                    Destroy(gameObject);
                 }
             }
         }
@@ -101,6 +101,6 @@ public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
 
     public void Interact(PlayerInteraction interactor)
     {
-        _animator.SetTrigger("Hit");
+        //_animator.SetTrigger("Hit");
     }
 }

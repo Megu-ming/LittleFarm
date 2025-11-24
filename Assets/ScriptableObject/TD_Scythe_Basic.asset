@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: tool_Scythe_basic
   _displayName: "\uB0AB"
-  _icon: {fileID: 21300000, guid: 045b9d98e73dfbe4eb77a90a9424d1b4, type: 3}
+  _icon: {fileID: 21300000, guid: b551a6d4dcab50b45a92c26436e8f011, type: 3}
   _toolPrefab: {fileID: 4615876370021909988, guid: 6fc9102782b3f3949868240b5c3b11dd, type: 3}
   _toolType: 5
   _power: 1
   _areaSize: {x: 1, y: 1}
+  _triggerName: 
