@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: tool_axe_basic
   _displayName: "\uB3C4\uB07C"
-  _icon: {fileID: 21300000, guid: d2ecbd23e932d1b4a9afd6aa35b590b1, type: 3}
+  _icon: {fileID: 21300000, guid: 52bf3d28a7ab0934b9f1e860a13febfa, type: 3}
   _toolPrefab: {fileID: 5185401560055460897, guid: df2fe070e3add3e4b91578440517f115, type: 3}
   _toolType: 1
   _power: 1
