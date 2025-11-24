@@ -96,7 +96,7 @@ public class ToolChangerUI : MonoBehaviour
 
     private void RefreshIcons()
     {
-        if (_slotImages == null)
+        if (_slotImages == null && _player == null)
             return;
 
         for (int i = 0; i < _slotImages.Length; i++)
