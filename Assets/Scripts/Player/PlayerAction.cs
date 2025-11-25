@@ -79,6 +79,12 @@ public class PlayerAction : MonoBehaviour
             if (target != null)
                 hitPoint = tile.occupant.transform.position;
         }
+        else
+        {
+            target = tile.GetComponent<IToolTarget>();
+            if (target != null)
+                hitPoint = tile.transform.position;
+        }
 
         if (target == null)
             return false;

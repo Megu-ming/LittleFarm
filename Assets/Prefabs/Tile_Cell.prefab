@@ -128,3 +128,4 @@ MonoBehaviour:
   autoMask: 0
   used: 0
   occupant: {fileID: 0}
+  _isTilled: 0

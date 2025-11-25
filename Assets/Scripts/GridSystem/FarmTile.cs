@@ -12,7 +12,7 @@ public enum TileType
     Path,
 }
 
-public class FarmTile : MonoBehaviour
+public class FarmTile : MonoBehaviour, IToolTarget
 {
     [Header("그리드 좌표")]
     public int x;
@@ -28,6 +28,10 @@ public class FarmTile : MonoBehaviour
     [Header("점유 상태")]
     public bool used = false;
     public GameObject occupant;
+
+    [SerializeField] bool _isTilled = false;
+    public bool CanBeTilled =>
+        !_isTilled && (tileType == TileType.Ground);
 
     // 점유자 설정
     public void SetOccupant(GameObject obj)
@@ -125,5 +129,24 @@ public class FarmTile : MonoBehaviour
         {
             Debug.LogWarning($"[FarmTile] Tag '{tagName}' 가 정의되어 있지 않습니다. (Tile {x},{z})");
         }
+    }
+
+    public void OnToolAction(ToolActionContext context)
+    {
+        if (context.toolType != ToolType.Hoe)
+            return;
+
+        if (!CanBeTilled)
+            return;
+
+        TillSoil();
+    }
+
+    void TillSoil()
+    {
+        _isTilled = true;
+        tileType = TileType.Soil;
+
+        Debug.Log($"[FarmTile]{name}경작 완료");
     }
 }   
