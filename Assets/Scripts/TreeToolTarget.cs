@@ -26,7 +26,7 @@ public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
 
     public void OnToolAction(ToolActionContext context)
     {
-        if(context.toolType == ToolType.Axe)
+        if(context.toolType == ToolType.Axe && _currentHealth > 0)
         {
             _currentHealth -= context.power;
             _animator.SetTrigger("Hit");

@@ -55,6 +55,15 @@ public class Player : MonoBehaviour
         _toolChangerUI = toolChangerUI;
     }
 
+    private void Update()
+    {
+        if(actionHold)
+            _action.Action();
+
+        if(interactHold)
+            _interaction.OnInteract();
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         _controller.Move(context.ReadValue<Vector2>());
@@ -65,19 +74,22 @@ public class Player : MonoBehaviour
         _controller.OnSprint(context);
     }
 
+    bool interactHold = false;
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (!context.performed)
-            return;
-
-        _interaction.OnInteract();
+        if (context.performed)
+            interactHold = true;
+        if (context.canceled)
+            interactHold = false;
     }
 
+    bool actionHold = false;
     public void OnAction(InputAction.CallbackContext context)
     {
-        float value = context.ReadValue<float>();
-        bool isPressed = value > 0.5f;
-        _action.Action(isPressed);
+        if (context.performed)
+            actionHold = true;
+        if(context.canceled)
+            actionHold = false;
     }
 
     public void OnTab(InputAction.CallbackContext context)

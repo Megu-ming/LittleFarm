@@ -31,9 +31,6 @@ public class GridTileDesigner : MonoBehaviour
     [Header("현재 선택된 머티리얼 인덱스")]
     public int selectedIndex = 0;
 
-    [Header("오토타일 룰 목록")]
-    public AutoTileRule[] autoTileRules;
-
     public TilePaintPreset CurrentPreset
     {
         get
@@ -83,59 +80,5 @@ public class GridTileDesigner : MonoBehaviour
 
         // 레이어/태그 동기화
         tile.SyncUnityMeta();
-
-        // 오토타일 데이터 갱신
-        grid.UpdateAutoTileAround(gx, gz);
-
-        // 오토타일 비주얼 갱신
-        UpdateAutoTileVisualAround(gx, gz);
-    }
-
-    private AutoTileRule FindRule(TileType type, int mask)
-    {
-        if (autoTileRules == null) return null;
-
-        for(int i=0;i<autoTileRules.Length;i++)
-        {
-            var rule = autoTileRules[i];
-            if(rule == null) continue;
-
-            if(rule.tileType == type && rule.mask == mask)
-                return rule;
-        }
-
-        return null;
-    }
-
-    private void ApplyAutoTileVisual(FarmTile tile)
-    {
-        if (tile == null) return;
-
-        AutoTileRule rule = FindRule(tile.tileType, tile.autoMask);
-
-        if (rule == null || rule.material == null) return;
-
-        var renderer = tile.GetComponent<MeshRenderer>();
-        if (renderer == null) return;
-
-        renderer.sharedMaterial = rule.material;
-    }
-
-    private void UpdateAutoTileVisualAround(int gx, int gz)
-    {
-        var center = grid.GetTile(gx, gz);
-        ApplyAutoTileVisual(center);
-
-        var up = grid.GetTile(gx, gz + 1);
-        ApplyAutoTileVisual(up);
-
-        var down = grid.GetTile(gx, gz - 1);
-        ApplyAutoTileVisual(down);
-
-        var left = grid.GetTile(gx - 1, gz);
-        ApplyAutoTileVisual(left);
-
-        var right = grid.GetTile(gx + 1, gz);
-        ApplyAutoTileVisual(right);
     }
 }

@@ -20,18 +20,24 @@ public class FarmTile : MonoBehaviour, IToolTarget
 
     [Header("타일 타입")]
     public TileType tileType = TileType.Ground;
-
-    [Header("오토타일용 이웃 마스크(디버그용)")]
-    [Tooltip("Up=1, Right=2, Down=4, Left=8 비트 마스크")]
-    public int autoMask;
+    [SerializeField] bool _isTilled = false;
 
     [Header("점유 상태")]
     public bool used = false;
     public GameObject occupant;
 
-    [SerializeField] bool _isTilled = false;
+    [Header("작물 상태")]
+    [SerializeField] bool _hasCrop = false;     // 이 타일에 작물이 있는가
+    [SerializeField] int _cropItemId = -1;      // 어떤 씨앗/작물인지 (ItemId)
+    [SerializeField] int _growthStage = 0;      // 성장 단계 (0 = 심은 직후)
+    [SerializeField] int _maxGrowthStage = 3;   // 최종 단계 (나중에 데이터화 예정)
+    [SerializeField] bool _wateredToday = false;// 오늘 물 줬는지
+
+    public bool IsTilled => _isTilled;
+    public bool HasCrop => _hasCrop;
     public bool CanBeTilled =>
         !_isTilled && (tileType == TileType.Ground);
+    public bool CanPlantSeed => _isTilled && !_hasCrop;
 
     // 점유자 설정
     public void SetOccupant(GameObject obj)
@@ -44,32 +50,6 @@ public class FarmTile : MonoBehaviour, IToolTarget
     {
         used = false;
         occupant = null;
-    }
-
-    public bool IsWalkable
-    {
-        get
-        {
-            switch(tileType)
-            {
-                case TileType.Ground:
-                case TileType.Soil:
-                case TileType.Path:
-                    return true;
-                case TileType.Water:
-                case TileType.Block:
-                default:
-                    return false;
-            }
-        }
-    }
-
-    public bool IsPlantable
-    {
-        get
-        {
-            return tileType == TileType.Soil;
-        }
     }
 
     private void OnValidate()
@@ -131,15 +111,20 @@ public class FarmTile : MonoBehaviour, IToolTarget
         }
     }
 
+    /// <summary>
+    /// 액션 들어왔을 때 호출
+    /// 호미면 경작지로 변경/ 곡괭이면 만약 경작지면 원래대로 돌림
+    /// </summary>
+    /// <param name="context"></param>
     public void OnToolAction(ToolActionContext context)
     {
-        if (context.toolType != ToolType.Hoe)
-            return;
-
         if (!CanBeTilled)
             return;
 
-        TillSoil();
+        if (context.toolType == ToolType.Hoe)
+            TillSoil();
+        else if (context.toolType == ToolType.Pickaxe)
+            ReturnSoil();
     }
 
     void TillSoil()
@@ -148,5 +133,28 @@ public class FarmTile : MonoBehaviour, IToolTarget
         tileType = TileType.Soil;
 
         Debug.Log($"[FarmTile]{name}경작 완료");
+    }
+
+    void ReturnSoil()
+    {
+        _isTilled = false;
+        tileType = TileType.Ground;
+
+        Debug.Log($"[FarmTile]{name} 되돌리기 완료");
+    }
+
+    public bool TryPlantSeed(int itemId, int maxGrowthStage)
+    {
+        if (!CanPlantSeed) return false;
+
+        _hasCrop = true;
+        _cropItemId = itemId;
+        _growthStage = 0;
+        _maxGrowthStage = maxGrowthStage;
+
+        // TODO: 여기서 "씨앗 프리팹"을 스폰하거나, 타일 비주얼을 '씨앗 심은 모양'으로 변경
+        Debug.Log($"[FarmTile] {name} 씨앗 심기 완료 (itemId={itemId})");
+
+        return true;
     }
 }   

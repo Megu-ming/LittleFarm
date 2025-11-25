@@ -17,12 +17,12 @@ public class PlayerAction : MonoBehaviour
         _animator = animator;
     }
 
-    public void Action(bool isPressed)
+    public void Action()
     {
         if (_player.CurrentState == PlayerState.Acting) return;
 
         var tool = CurrentTool;
-        if (isPressed == false || tool == null || tool.ToolType == ToolType.None) return;
+        if (tool == null || tool.ToolType == ToolType.None) return;
 
         _cachedActionTile = _gridSelector != null ? _gridSelector.CurrentTile : null;
         FaceActionTarget();

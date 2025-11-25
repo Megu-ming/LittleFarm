@@ -52,20 +52,20 @@ public class StoneToolTarget : MonoBehaviour, IToolTarget, IInteractable
         var db = GameInitializer.Instance.Database;
         if(db == null )
         {
-            Debug.LogWarning("[TreeToolTarget] ItemDatabase가 없습니다.");
+            Debug.LogWarning("[StoneToolTarget] ItemDatabase가 없습니다.");
             return;
         }
 
         if(string.IsNullOrEmpty(_dropItemKey ) )
         {
-            Debug.LogWarning("[TreeToolTarget] 드랍 아이템 Key가 없습니다.");
+            Debug.LogWarning("[StoneToolTarget] 드랍 아이템 Key가 없습니다.");
             return;
         }
 
         ItemSpec spec = db.GetByKey(_dropItemKey);
         if(spec == null)
         {
-            Debug.LogWarning($"[TreeToolTarget] 드랍 아이템을 찾을 수 없습니다. key = {_dropItemKey}");
+            Debug.LogWarning($"[StoneToolTarget] 드랍 아이템을 찾을 수 없습니다. key = {_dropItemKey}");
             return;
         }
 
@@ -77,7 +77,7 @@ public class StoneToolTarget : MonoBehaviour, IToolTarget, IInteractable
         GameObject prefab = Resources.Load<GameObject>($"ItemDrops/{spec.worldKey}");
         if(prefab == null)
         {
-            Debug.LogWarning($"[TreeToolTarget] 프리팹을 찾을 수 없습니다: Resources/ItemDrops/{spec.worldKey}");
+            Debug.LogWarning($"[StoneToolTarget] 프리팹을 찾을 수 없습니다: Resources/ItemDrops/{spec.worldKey}");
             return;
         }
 

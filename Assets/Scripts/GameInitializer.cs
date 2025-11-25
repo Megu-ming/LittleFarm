@@ -8,10 +8,12 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] Player _player;
     [SerializeField] ItemDatabase _database;
     [SerializeField] Inventory _inventory;
+    [SerializeField] GameTimeManager _timeManager;
 
     [Header("UI 참조")]
     [SerializeField] ToolChangerUI _toolChangerUI;
     [SerializeField] InventoryUI _inventoryUI;
+    [SerializeField] TimeUI _timeUI;
 
     public ItemDatabase Database => _database;
 
@@ -47,5 +49,8 @@ public class GameInitializer : MonoBehaviour
         _inventoryUI.Initialize(_inventory, _database);
         _toolChangerUI.Initialize(_player);
         _player.Initialize(_inventoryUI, _toolChangerUI);
+
+        _timeManager.Initialize();
+        _timeUI.Initialize(_timeManager);
     }
 }
