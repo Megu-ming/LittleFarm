@@ -16,12 +16,12 @@ TagManager:
   - 
   - Water
   - UI
+  - Tile
   - 
-  - Tile_Ground
-  - Tile_Water
-  - Tile_Block
-  - Tile_Soil
-  - Tile_Path
+  - 
+  - 
+  - 
+  - 
   - Interactable
   - 
   - 

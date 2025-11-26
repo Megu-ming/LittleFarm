@@ -17,6 +17,8 @@ public class GridManager : MonoBehaviour
     // 생성한 타일들 저장
     FarmTile[,] tiles;
 
+    public FarmTile[,] Tiles => tiles;
+
     private void OnEnable()
     {
         var existingTiles = GetComponentsInChildren<FarmTile>();

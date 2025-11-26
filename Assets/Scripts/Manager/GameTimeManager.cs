@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GameTimeManager : MonoBehaviour
 {
@@ -99,6 +98,7 @@ public class GameTimeManager : MonoBehaviour
             if (_hour >= 24)
                 _hour -= 24; // 날짜는 여기서는 안 바꿈 (침대/02:00에서만 바꿈)
         }
+        // 10분마다 UI 변경
         if (_minute % 10 == 0)
             OnTimeChanged?.Invoke(_hour, _minute);
 

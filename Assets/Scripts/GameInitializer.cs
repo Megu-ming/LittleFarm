@@ -9,6 +9,8 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] ItemDatabase _database;
     [SerializeField] Inventory _inventory;
     [SerializeField] GameTimeManager _timeManager;
+    [SerializeField] CropManager _cropManager;
+    [SerializeField] GridManager _gridManager;
 
     [Header("UI 참조")]
     [SerializeField] ToolChangerUI _toolChangerUI;
@@ -52,5 +54,7 @@ public class GameInitializer : MonoBehaviour
 
         _timeManager.Initialize();
         _timeUI.Initialize(_timeManager);
+
+        _cropManager.Initialize(_timeManager, _gridManager);
     }
 }

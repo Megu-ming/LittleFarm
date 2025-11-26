@@ -18,7 +18,7 @@ public class GridSelector : MonoBehaviour
 
     [Header("타일 하이라이트")]
     [SerializeField] GameObject tileHighlightPrefab;
-    [SerializeField] float highlightYPos = 0.05f;
+    [SerializeField] float highlightYPos = 0.11f;
 
     [Header("타일 범위")]
     [SerializeField] int maxRangeInTiles = 1;

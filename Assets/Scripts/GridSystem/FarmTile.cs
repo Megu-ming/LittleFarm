@@ -12,7 +12,7 @@ public enum TileType
     Path,
 }
 
-public class FarmTile : MonoBehaviour, IToolTarget
+public class FarmTile : MonoBehaviour, IToolTarget, IInteractable
 {
     [Header("그리드 좌표")]
     public int x;
@@ -156,5 +156,24 @@ public class FarmTile : MonoBehaviour, IToolTarget
         Debug.Log($"[FarmTile] {name} 씨앗 심기 완료 (itemId={itemId})");
 
         return true;
+    }
+
+    public void AdvancedGrowthOneDay()
+    {
+        if (!_hasCrop) return;
+        if (_growthStage >= _maxGrowthStage) return;
+
+        if(_wateredToday)
+            _growthStage++;
+
+        // TODO:
+        // 작물 성장 이벤트 호출
+        Debug.Log($"[FarmTile] {name} 성장 단계 : {_growthStage}/{_maxGrowthStage}");
+    }
+
+    public void Interact(PlayerInteraction interactor)
+    {
+        if(CanPlantSeed && !_hasCrop)
+            TryPlantSeed(3001, 3);
     }
 }   
