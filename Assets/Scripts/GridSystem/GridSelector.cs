@@ -48,7 +48,7 @@ public class GridSelector : MonoBehaviour
 
         if (isFocus)
         {
-            if (_tileHighlightInstance != null)
+            if (_tileHighlightInstance != null && _currentTile != null)
             {
                 _tileHighlightInstance.transform.position =
                     _currentTile.transform.position + Vector3.up * highlightYPos;

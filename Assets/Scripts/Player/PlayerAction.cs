@@ -54,7 +54,7 @@ public class PlayerAction : MonoBehaviour
     }
 
     /// <summary>
-    /// 행동 애니메이션 클립에서 호출됨
+    /// 각 도구 행동 애니메이션 클립에서 타이밍에 맞게 호출됨
     /// </summary>
     /// <returns></returns>
     public bool TryDoToolAction()
@@ -63,31 +63,14 @@ public class PlayerAction : MonoBehaviour
         if (tool == null || tool.ToolType == ToolType.None)
             return false;
 
-        FarmTile tile = _cachedActionTile;
+        FarmTile target = _cachedActionTile;
         _cachedActionTile = null;
-
-        if (tile == null)
-            return false;
-
-        IToolTarget target = null;
-        Vector3 hitPoint = tile.transform.position;
-        Vector3 hitNormal = Vector3.up;
-
-        if(tile.occupant != null)
-        {
-            target = tile.occupant.GetComponentInChildren<IToolTarget>();
-            if (target != null)
-                hitPoint = tile.occupant.transform.position;
-        }
-        else
-        {
-            target = tile.GetComponent<IToolTarget>();
-            if (target != null)
-                hitPoint = tile.transform.position;
-        }
 
         if (target == null)
             return false;
+
+        Vector3 hitPoint = target.transform.position;
+        Vector3 hitNormal = Vector3.up;
 
         var ctx = new ToolActionContext
         {

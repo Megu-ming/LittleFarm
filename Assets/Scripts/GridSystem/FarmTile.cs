@@ -12,7 +12,7 @@ public enum TileType
     Path,
 }
 
-public class FarmTile : MonoBehaviour, IToolTarget, IInteractable
+public class FarmTile : MonoBehaviour, IInteractable
 {
     [Header("그리드 좌표")]
     public int x;
@@ -69,17 +69,8 @@ public class FarmTile : MonoBehaviour, IToolTarget, IInteractable
 
     public void SyncUnityMeta()
     {
-        string layerName = tileType switch
-        {
-            TileType.Ground => "Tile_Ground",
-            TileType.Water => "Tile_Water",
-            TileType.Block => "Tile_Block",
-            TileType.Soil => "Tile_Soil",
-            TileType.Path => "Tile_Path",
-            _ => "Tile_Ground",
-        };
+        string layerName = "Tile";
 
-        // 2) 타일 타입 → 태그 이름 매핑
         string tagName = tileType switch
         {
             TileType.Ground => "GroundTile",
@@ -114,17 +105,26 @@ public class FarmTile : MonoBehaviour, IToolTarget, IInteractable
     /// <summary>
     /// 액션 들어왔을 때 호출
     /// 호미면 경작지로 변경/ 곡괭이면 만약 경작지면 원래대로 돌림
+    /// 타일 위에 점유자가 있으면 Action양도
     /// </summary>
     /// <param name="context"></param>
     public void OnToolAction(ToolActionContext context)
     {
-        if (!CanBeTilled)
-            return;
+        if(occupant == null)
+        {
+            if (!CanBeTilled)
+                return;
 
-        if (context.toolType == ToolType.Hoe)
-            TillSoil();
-        else if (context.toolType == ToolType.Pickaxe)
-            ReturnSoil();
+            if (context.toolType == ToolType.Hoe)
+                TillSoil();
+            else if (context.toolType == ToolType.Pickaxe)
+                ReturnSoil();
+        }
+        else
+        {
+            var target = occupant.GetComponent<IToolTarget>();
+            target.OnToolAction(context);
+        }
     }
 
     void TillSoil()
