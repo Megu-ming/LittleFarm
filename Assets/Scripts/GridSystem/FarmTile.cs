@@ -35,9 +35,9 @@ public class FarmTile : MonoBehaviour, IInteractable
 
     public bool IsTilled => _isTilled;
     public bool HasCrop => _hasCrop;
-    public bool CanBeTilled =>
-        !_isTilled && (tileType == TileType.Ground);
+    public bool CanBeTilled => !_isTilled && (tileType == TileType.Ground);
     public bool CanPlantSeed => _isTilled && !_hasCrop;
+    public bool IsWalkable => tileType != TileType.Block && tileType != TileType.Water;
 
     // 점유자 설정
     public void SetOccupant(GameObject obj)
