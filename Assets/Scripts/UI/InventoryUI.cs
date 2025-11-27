@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class InventoryUI : MonoBehaviour
 {
-    [Header("ÂüÁ¶")]
+    [Header("ì°¸ì¡°")]
     [SerializeField] Inventory _inventory;
     [SerializeField] Transform _slotParent;
     [SerializeField] InventorySlotUI _slotPrefab;
@@ -11,8 +11,7 @@ public class InventoryUI : MonoBehaviour
 
     ItemDatabase _database;
 
-    [Header("»óÅÂ")]
-    [SerializeField] bool _isOpen = false;
+    bool _isOpen = false;
 
     public void Initialize(Inventory inventory, ItemDatabase database)
     {
@@ -58,8 +57,11 @@ public class InventoryUI : MonoBehaviour
         if(_isOpen)
         {
             RefreshAll();
-            // ½Ã°£¸ØÃß±â, µîµî
+            // ì¸ë²¤í† ë¦¬ ì˜¤í”ˆ ì‹œ ì‹œê°„ ì •ì§€
+            Time.timeScale = 0f;
         }
+        else
+            Time.timeScale = 1f;
     }
 
     public void RefreshAll()

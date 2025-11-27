@@ -5,3 +5,5 @@ id,key,name,desc,category,maxStack,buyPrice,sellPrice,iconKey,worldKey,toolKey
 2002,PICK_ITEM,곡괭이,돌과 광석을 캘 수 있는 도구,Tool,1,0,0,ICON_PICKAXE,DROP_PICKAXE,PICKAXE_01
 3001,POTATO_SEED,감자 씨앗,감자를 심을 수 있는 씨앗이다,Seed,99,50,25,ICON_POTATO_SEED,DROP_POTATO_SEED,
 3002,POTATO,감자,수확한 감자다,Crop,99,0,60,ICON_POTATO,DROP_POTATO,
+3003,CARROT_SEED,당근 씨앗,당근을 심을 수 있는 씨앗이다,Seed,99,50,25,ICON_CARROT_SEED,DROP_CARROT_SEED,
+3004,CARROT,당근,수확한 당근이다,Crop,99,0,60,ICON_CARROT,DROP_CARROT,
