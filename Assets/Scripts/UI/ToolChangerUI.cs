@@ -83,15 +83,21 @@ public class ToolChangerUI : MonoBehaviour
 
     private void ConfirmSelection()
     {
-        if (_currentIndex < 0 || _player ==null || _currentIndex >= _player.Tools.Length)
+        if (_player ==null || _currentIndex >= _player.Tools.Length)
             return;
 
-        ToolData selected = _player.Tools[_currentIndex];
-        if (selected == null)
-            return;
+        if (_currentIndex >= 0)
+        {
+            ToolData selected = _player.Tools[_currentIndex];
+            if (selected == null)
+                return;
 
-        _player.EquipTool(selected);
-        Debug.Log($"[ToolChangerUI] 선택된 도구: {selected.DisplayName} ({selected.ToolType})");
+            _player.EquipTool(selected);
+            Debug.Log($"[ToolChangerUI] 선택된 도구: {selected.DisplayName} ({selected.ToolType})");
+        }
+
+        // 선택 취소했으면
+        _player.EquipTool(null);
     }
 
     private void RefreshIcons()

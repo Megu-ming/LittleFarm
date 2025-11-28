@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     [Header("인벤토리")]
     [SerializeField] Inventory _inventory;
     [SerializeField] InventoryUI _inventoryUI;
+    [SerializeField] QuickSlotUI _quickSlotUI;
 
     [Header("도구")]
     [SerializeField] ToolData[] _tools = new ToolData[6];
@@ -33,18 +34,30 @@ public class Player : MonoBehaviour
 
     [Header("현재 상태")]
     [SerializeField] PlayerState _currentState = PlayerState.Idle;
+    [SerializeField] int _hand = 0;
 
     // 읽기 전용 프로퍼티
     public PlayerState CurrentState => _currentState;
     public ToolData[] Tools => _tools;
     public ToolData CurrentToolData => _currentToolData;
+    public int Hand => _hand;
 
     public void SetState(PlayerState state)
     {
         _currentState = state;
     }
 
-    public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI)
+    public void SetHand(int index)
+    {
+        if (index < 0 || index >= 10)
+        { 
+            _hand = 0; 
+            return; 
+        }
+        _hand = index;
+    }
+
+    public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, QuickSlotUI quickSlotUI)
     {
         _controller.Initialize(this, _characterController, _animator, _gridSelector);
         _action.Initialize(this, _gridSelector, _animator);
@@ -52,6 +65,7 @@ public class Player : MonoBehaviour
         _itemMagnet.Initialize(this);
 
         _inventoryUI = inventoryUI;
+        _quickSlotUI = quickSlotUI;
         _toolChangerUI = toolChangerUI;
     }
 
@@ -135,8 +149,11 @@ public class Player : MonoBehaviour
             return false;
 
         bool allAdded = _inventory.TryAddItem(itemId, amount, out int remainder);
-        if (_inventoryUI != null)
+        if (_inventoryUI != null && _quickSlotUI)
+        {
             _inventoryUI.RefreshAll();
+            _quickSlotUI.RefreshAll();
+        }
 
         return allAdded && remainder == 0;
     }

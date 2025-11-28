@@ -15,6 +15,7 @@ public class GameInitializer : MonoBehaviour
     [Header("UI 참조")]
     [SerializeField] ToolChangerUI _toolChangerUI;
     [SerializeField] InventoryUI _inventoryUI;
+    [SerializeField] QuickSlotUI _quickSlotUI;
     [SerializeField] TimeUI _timeUI;
 
     public ItemDatabase Database => _database;
@@ -50,7 +51,8 @@ public class GameInitializer : MonoBehaviour
         _inventory.Initialize(_database);
         _inventoryUI.Initialize(_inventory, _database);
         _toolChangerUI.Initialize(_player);
-        _player.Initialize(_inventoryUI, _toolChangerUI);
+        _quickSlotUI.Initialize(_player, _inventory, _database);
+        _player.Initialize(_inventoryUI, _toolChangerUI, _quickSlotUI);
 
         _timeManager.Initialize();
         _timeUI.Initialize(_timeManager);
