@@ -95,9 +95,8 @@ public class ToolChangerUI : MonoBehaviour
             _player.EquipTool(selected);
             Debug.Log($"[ToolChangerUI] 선택된 도구: {selected.DisplayName} ({selected.ToolType})");
         }
-
-        // 선택 취소했으면
-        _player.EquipTool(null);
+        else // 선택 취소했으면
+            _player.EquipTool(null);
     }
 
     private void RefreshIcons()

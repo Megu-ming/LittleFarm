@@ -120,7 +120,7 @@ public class Player : MonoBehaviour
 
     public void EquipTool(ToolData selected)
     {
-        if (_currentToolInstance != null)
+        if (_currentToolInstance != null && selected == null)
         {
             Destroy(_currentToolInstance);
             _currentToolInstance = null;
