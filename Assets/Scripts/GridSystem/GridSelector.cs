@@ -93,7 +93,7 @@ public class GridSelector : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(mousePos);
 
         // 1) 바닥/타일에 레이 쏴서 마우스 방향의 월드지점 얻기
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, tileMask))
+        if (!Physics.Raycast(ray, out RaycastHit hit, 1000f, tileMask))
             return false;
 
         Vector3 aimWorld = hit.point;

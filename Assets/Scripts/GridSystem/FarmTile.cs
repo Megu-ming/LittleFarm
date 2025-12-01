@@ -1,25 +1,42 @@
 using UnityEngine;
+using UnityEditor.Experimental.GraphView;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 public enum TileType
 {
-    Ground,
-    Water,
-    Block,
-    Soil,
-    Path,
+    Ground,     // 경작 가능한 땅
+    Tilled,     // 경작한 땅
+    Watered,    // 젖은 경작한 땅(물을 준)
+    Path,       // 경작 불가능한 땅
+    Water,      // 물(강, 호수, 바다)
+    Block,      // 막힌 곳
 }
 
 public class FarmTile : MonoBehaviour, IInteractable
 {
     [Header("그리드 좌표")]
-    public int x;
-    public int z;
+    [SerializeField] Vector2Int _gridPos;
+    public Vector2Int GridPos => _gridPos;
+    public void SetGridPos(int x, int z) => _gridPos = new Vector2Int(x, z);
 
     [Header("타일 타입")]
-    public TileType tileType = TileType.Ground;
+    [SerializeField] TileType _tileType = TileType.Ground;
+    public TileType TileType
+    {
+        get => _tileType;
+        set
+        {
+            if(_tileType == value) return;
+            _tileType = value;
+            OnTileTypeChanged?.Invoke(this, value);
+        }
+    }
+
+    public event System.Action<FarmTile, TileType> OnTileTypeChanged;
+
     [SerializeField] bool _isTilled = false;
 
     [Header("점유 상태")]
@@ -35,9 +52,9 @@ public class FarmTile : MonoBehaviour, IInteractable
 
     public bool IsTilled => _isTilled;
     public bool HasCrop => _hasCrop;
-    public bool CanBeTilled => !_isTilled && (tileType == TileType.Ground);
+    public bool CanBeTilled => !_isTilled && (_tileType == TileType.Ground);
     public bool CanPlantSeed => _isTilled && !_hasCrop;
-    public bool IsWalkable => tileType != TileType.Block && tileType != TileType.Water;
+    public bool IsWalkable => _tileType != TileType.Block && _tileType != TileType.Water;
 
     // 점유자 설정
     public void SetOccupant(GameObject obj)
@@ -71,12 +88,13 @@ public class FarmTile : MonoBehaviour, IInteractable
     {
         string layerName = "Tile";
 
-        string tagName = tileType switch
+        string tagName = _tileType switch
         {
             TileType.Ground => "GroundTile",
+            TileType.Tilled => "TilledTile",
+            TileType.Watered => "WateredTile",
             TileType.Water => "WaterTile",
             TileType.Block => "BlockTile",
-            TileType.Soil => "SoilTile",
             TileType.Path => "PathTile",
             _ => "GroundTile"
         };
@@ -85,7 +103,7 @@ public class FarmTile : MonoBehaviour, IInteractable
         int layerIndex = LayerMask.NameToLayer(layerName);
         if(layerIndex == -1)
         {
-            Debug.LogWarning($"[FarmTile] Layer '{layerName}'가 정의되어 있지 않습니다. (Tile {x},{z})");
+            Debug.LogWarning($"[FarmTile] Layer '{layerName}'가 정의되어 있지 않습니다. (Tile {_gridPos.x},{_gridPos.y})");
         }
         else
         {
@@ -98,7 +116,7 @@ public class FarmTile : MonoBehaviour, IInteractable
         }
         catch
         {
-            Debug.LogWarning($"[FarmTile] Tag '{tagName}' 가 정의되어 있지 않습니다. (Tile {x},{z})");
+            Debug.LogWarning($"[FarmTile] Tag '{tagName}' 가 정의되어 있지 않습니다. (Tile {_gridPos.x} , {_gridPos.y})");
         }
     }
 
@@ -119,6 +137,8 @@ public class FarmTile : MonoBehaviour, IInteractable
                 TillSoil();
             else if (context.toolType == ToolType.Pickaxe)
                 ReturnSoil();
+            else if (context.toolType == ToolType.WateringCan)
+                WaterSoil();
         }
         else
         {
@@ -129,18 +149,21 @@ public class FarmTile : MonoBehaviour, IInteractable
 
     void TillSoil()
     {
-        _isTilled = true;
-        tileType = TileType.Soil;
-
-        Debug.Log($"[FarmTile]{name}경작 완료");
+        TileType = TileType.Tilled;
     }
 
     void ReturnSoil()
     {
         _isTilled = false;
-        tileType = TileType.Ground;
+        TileType = TileType.Ground;
 
         Debug.Log($"[FarmTile]{name} 되돌리기 완료");
+    }
+
+    void WaterSoil()
+    {
+        if (_tileType == TileType.Tilled)
+            TileType = TileType.Watered;
     }
 
     public bool TryPlantSeed(int itemId, int maxGrowthStage)

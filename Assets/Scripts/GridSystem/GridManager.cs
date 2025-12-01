@@ -77,8 +77,7 @@ public class GridManager : MonoBehaviour
                 FarmTile farmTile = tileObj.GetComponent<FarmTile>();
                 if (farmTile != null)
                 {
-                    farmTile.x = x;
-                    farmTile.z = z;
+                    farmTile.SetGridPos(x, z);
                     tiles[x, z] = farmTile;
                 }
             }
@@ -94,8 +93,8 @@ public class GridManager : MonoBehaviour
 
         foreach(FarmTile tile in foundTiles)
         {
-            int x = tile.x;
-            int z = tile.z;
+            int x = tile.GridPos.x;
+            int z = tile.GridPos.y;
 
             if (x < 0 || x >= width || z < 0 || z >= height)
                 continue;

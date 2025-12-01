@@ -11,6 +11,7 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] GameTimeManager _timeManager;
     [SerializeField] CropManager _cropManager;
     [SerializeField] GridManager _gridManager;
+    [SerializeField] TerrainGridManager _tgManager;
 
     [Header("UI 참조")]
     [SerializeField] ToolChangerUI _toolChangerUI;
@@ -46,6 +47,8 @@ public class GameInitializer : MonoBehaviour
     private void Start()
     {
         instance = this;
+
+        _tgManager.Initialize();
 
         _database.Initialize();
         _inventory.Initialize(_database);

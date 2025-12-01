@@ -76,7 +76,7 @@ public class GridTileDesigner : MonoBehaviour
         }
 
         // 타일 타입 변경
-        tile.tileType = preset.tileType;
+        tile.TileType = preset.tileType;
 
         // 레이어/태그 동기화
         tile.SyncUnityMeta();
