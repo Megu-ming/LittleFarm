@@ -69,13 +69,11 @@ public class PlayerController : MonoBehaviour
         {
             _cacheMoveSpeed = _moveSpeed;
             _moveSpeed *= 0.5f;
-            _gridSeletor.SetFocus(true);
         }
 
         if (context.canceled)
         {
             _moveSpeed = _cacheMoveSpeed;
-            _gridSeletor.SetFocus(false);
         }
     }
 }

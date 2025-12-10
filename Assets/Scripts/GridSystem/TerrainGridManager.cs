@@ -90,13 +90,13 @@ public class TerrainGridManager : MonoBehaviour
         if (gx < 0 || gz < 0 || gx >= _alphaWidth || gz >= _alphaHeight)
             return;
 
-        float[,,] alpha = _terrainData.GetAlphamaps(gz, gx, 1, 1); // 해당 픽셀만 가져오기
+        float[,,] alpha = _terrainData.GetAlphamaps(gx, gz, 1, 1); // 해당 픽셀만 가져오기
         for (int l = 0; l < _layersCount; l++)
             alpha[0, 0, l] = 0f;
         if (texIndex >= 0 && texIndex < _layersCount)
             alpha[0, 0, texIndex] = 1f;
 
-        _terrainData.SetAlphamaps(gz, gx, alpha);
+        _terrainData.SetAlphamaps(gx, gz, alpha);
     }
 
     int GetTextureIndexFor(FarmTile tile)

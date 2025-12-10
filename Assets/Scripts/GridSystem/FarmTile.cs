@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,6 +17,7 @@ public enum TileType
     Block,      // 막힌 곳
 }
 
+[Serializable]
 public class FarmTile : MonoBehaviour, IInteractable
 {
     [Header("그리드 좌표")]
@@ -52,7 +55,7 @@ public class FarmTile : MonoBehaviour, IInteractable
 
     public bool IsTilled => _isTilled;
     public bool HasCrop => _hasCrop;
-    public bool CanBeTilled => !_isTilled && (_tileType == TileType.Ground);
+    public bool CanBeTilled => _tileType == TileType.Ground || _tileType == TileType.Tilled;
     public bool CanPlantSeed => _isTilled && !_hasCrop;
     public bool IsWalkable => _tileType != TileType.Block && _tileType != TileType.Water;
 

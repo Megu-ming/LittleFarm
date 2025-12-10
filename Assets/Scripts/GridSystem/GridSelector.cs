@@ -1,5 +1,6 @@
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
@@ -28,7 +29,6 @@ public class GridSelector : MonoBehaviour
     bool isFocus;
 
     public FarmTile CurrentTile => _currentTile;
-    public bool SetFocus(bool value) => isFocus = value;
 
     private void Awake()
     {
@@ -46,17 +46,12 @@ public class GridSelector : MonoBehaviour
     {
         UpdateCurrentTileFromMouseDirection();
 
-        if (isFocus)
+        if (_tileHighlightInstance != null && _currentTile != null)
         {
-            if (_tileHighlightInstance != null && _currentTile != null)
-            {
-                _tileHighlightInstance.transform.position =
-                    _currentTile.transform.position + Vector3.up * highlightYPos;
-                SetHighlightActive(true);
-            }
+            _tileHighlightInstance.transform.position =
+                _currentTile.transform.position + Vector3.up * highlightYPos;
+            SetHighlightActive(true);
         }
-        else
-            SetHighlightActive(false);
     }
 
     private void UpdateCurrentTileFromMouseDirection()
@@ -78,6 +73,14 @@ public class GridSelector : MonoBehaviour
             _tileHighlightInstance.SetActive(isActive);
         }
     }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Ray ray = cam.ScreenPointToRay(mousePos);
+        Gizmos.DrawSphere(ray.origin, 0.1f);
+        Gizmos.DrawRay(ray);
+    }
 
     /// <summary>
     /// 마우스 방향의 플레이어 기준 범위 내의 타일 반환
@@ -94,8 +97,11 @@ public class GridSelector : MonoBehaviour
 
         // 1) 바닥/타일에 레이 쏴서 마우스 방향의 월드지점 얻기
         if (!Physics.Raycast(ray, out RaycastHit hit, 1000f, tileMask))
+        {
+            Debug.Log("Raycast Failed!");
             return false;
-
+        }
+        
         Vector3 aimWorld = hit.point;
 
         if (!grid.WorldToGrid(playerPos, out int px, out int pz))

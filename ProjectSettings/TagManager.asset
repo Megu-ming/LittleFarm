@@ -5,10 +5,11 @@ TagManager:
   serializedVersion: 3
   tags:
   - GroundTile
-  - WaterTile
   - BlockTile
-  - SoilTile
   - PathTile
+  - WateredTile
+  - WaterTile
+  - TilledTile
   layers:
   - Default
   - TransparentFX
