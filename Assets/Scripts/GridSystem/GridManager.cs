@@ -56,17 +56,17 @@ public class GridManager : MonoBehaviour
         // 2) 배열 새로 만들기
         tiles = new FarmTile[width, height];
 
-        float offsetX = -(width - 1) * 0.5f * cellSize;
-        float offsetZ = -(height - 1) * 0.5f * cellSize;
+        //float offsetX = -(width - 1) * 0.5f * cellSize;
+        //float offsetZ = -(height - 1) * 0.5f * cellSize;
 
         for (int z = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
                 Vector3 pos = new Vector3(
-                    transform.position.x + offsetX + x * cellSize,
+                    transform.position.x + (x + 0.5f) * cellSize,
                     transform.position.y + 0.01f,
-                    transform.position.z + offsetZ + z * cellSize
+                    transform.position.z + (z + 0.5f) * cellSize
                 );
 
                 GameObject tileObj = (GameObject)Instantiate(
@@ -113,19 +113,16 @@ public class GridManager : MonoBehaviour
 
     public bool WorldToGrid(Vector3 worldPos, out int x, out int z)
     {
-        // GenerateGrid에서 사용한 것과 같은 offset 계산
-        float offsetX = -(width - 1) * 0.5f * cellSize;
-        float offsetZ = -(height - 1) * 0.5f * cellSize;
-
-        // 그리드 중심(Ground.position)을 기준으로 로컬 좌표로 변환
+        // 그리드 좌하단 기준 로컬 좌표
         float localX = worldPos.x - transform.position.x;
         float localZ = worldPos.z - transform.position.z;
 
-        float fx = (localX - offsetX) / cellSize;
-        float fz = (localZ - offsetZ) / cellSize;
+        // 타일 크기로 나눠서 인덱스 계산
+        float fx = localX / cellSize;
+        float fz = localZ / cellSize;
 
-        x = Mathf.RoundToInt(fx);
-        z = Mathf.RoundToInt(fz);
+        x = Mathf.FloorToInt(fx);
+        z = Mathf.FloorToInt(fz);
 
         if (x < 0 || x >= width || z < 0 || z >= height)
             return false;

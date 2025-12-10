@@ -5,7 +5,7 @@ public class TerrainGridManager : MonoBehaviour
     [SerializeField] Terrain _terrain;
     [SerializeField] GridManager _gridManager;
 
-    [Header("Å¸ÀÏ Å¸ÀÔ ¡ê Terrain ÅØ½ºÃ³ ÀÎµ¦½º ¸ÅÇÎ")]
+    [Header("íƒ€ì¼ íƒ€ì… â†” Terrain í…ìŠ¤ì²˜ ì¸ë±ìŠ¤ ë§¤í•‘")]
     [SerializeField] int _groundTextureIndex = 0;
     [SerializeField] int _tilledTextureIndex = 1;
     [SerializeField] int _wateredTextureIndex = 2;
@@ -38,7 +38,7 @@ public class TerrainGridManager : MonoBehaviour
 
         if (w != _alphaWidth || h != _alphaHeight)
         {
-            Debug.LogWarning($"[TerrainGridPainter] Grid({w}x{h})¿Í Alphamap({_alphaWidth}x{_alphaHeight}) Å©±â°¡ ´Ù¸¨´Ï´Ù. 1:1 ¸ÅÇÎÀÌ ¾Æ´Õ´Ï´Ù.");
+            Debug.LogWarning($"[TerrainGridPainter] Grid({w}x{h})ì™€ Alphamap({_alphaWidth}x{_alphaHeight}) í¬ê¸°ê°€ ë‹¤ë¦…ë‹ˆë‹¤. 1:1 ë§¤í•‘ì´ ì•„ë‹™ë‹ˆë‹¤.");
         }
 
         float[,,] alphas = new float[_alphaWidth, _alphaHeight, _layersCount];
@@ -50,9 +50,9 @@ public class TerrainGridManager : MonoBehaviour
                 var tile = tiles[x, z];
                 int texIndex = GetTextureIndexFor(tile);
 
-                // ¸ğµç ·¹ÀÌ¾î 0À¸·Î
+                // ëª¨ë“  ë ˆì´ì–´ 0ìœ¼ë¡œ
                 for (int l = 0; l < _layersCount; l++)
-                    alphas[z, x, l] = 0f; // [y, x, layer] ¼ø¼­ ÁÖÀÇ
+                    alphas[z, x, l] = 0f; // [y, x, layer] ìˆœì„œ ì£¼ì˜
 
                 if (texIndex >= 0 && texIndex < _layersCount)
                     alphas[z, x, texIndex] = 1f;
@@ -81,7 +81,7 @@ public class TerrainGridManager : MonoBehaviour
 
     void HandleTileTypeChanged(FarmTile tile, TileType newType)
     {
-        // ÇØ´ç Å¸ÀÏ ÇÏ³ª¸¸ ¾ËÆÄ¸Ê °»½Å
+        // í•´ë‹¹ íƒ€ì¼ í•˜ë‚˜ë§Œ ì•ŒíŒŒë§µ ê°±ì‹ 
         var pos = tile.GridPos;
         int gx = pos.x;
         int gz = pos.y;
@@ -90,7 +90,7 @@ public class TerrainGridManager : MonoBehaviour
         if (gx < 0 || gz < 0 || gx >= _alphaWidth || gz >= _alphaHeight)
             return;
 
-        float[,,] alpha = _terrainData.GetAlphamaps(gx, gz, 1, 1); // ÇØ´ç ÇÈ¼¿¸¸ °¡Á®¿À±â
+        float[,,] alpha = _terrainData.GetAlphamaps(gx, gz, 1, 1); // í•´ë‹¹ í”½ì…€ë§Œ ê°€ì ¸ì˜¤ê¸°
         for (int l = 0; l < _layersCount; l++)
             alpha[0, 0, l] = 0f;
         if (texIndex >= 0 && texIndex < _layersCount)
@@ -114,4 +114,31 @@ public class TerrainGridManager : MonoBehaviour
         }
         return _groundTextureIndex;
     }
+
+    int WorldToAlphaX(Vector3 worldPos)
+    {
+        var data = _terrain.terrainData;
+
+        // Terrain ë¡œì»¬ ì¢Œí‘œ
+        Vector3 local = worldPos - _terrain.transform.position;
+
+        // 0~1 ì •ê·œí™”
+        float nx = Mathf.Clamp01(local.x / data.size.x);
+
+        // ì•ŒíŒŒë§µ ì¸ë±ìŠ¤ (0 ~ alphamapWidth-1)
+        int ax = Mathf.RoundToInt(nx * (data.alphamapWidth - 1));
+        return ax;
+    }
+
+    int WorldToAlphaZ(Vector3 worldPos)
+    {
+        var data = _terrain.terrainData;
+
+        Vector3 local = worldPos - _terrain.transform.position;
+        float nz = Mathf.Clamp01(local.z / data.size.z);
+
+        int az = Mathf.RoundToInt(nz * (data.alphamapHeight - 1));
+        return az;
+    }
+
 }
