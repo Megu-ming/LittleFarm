@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// 월드에 드랍되는 아이템
+/// </summary>
 public class ItemPickup : MonoBehaviour
 {
     [Header("아이템 정보")]

@@ -93,7 +93,6 @@ MonoBehaviour:
   _slotParent: {fileID: 659363885650280100}
   _slotPrefab: {fileID: 1185233428408577191, guid: 2acb919233f3d5643832778136dea989, type: 3}
   _slotUIs: []
-  _isOpen: 0
 --- !u!1001 &5101151700815198045
 PrefabInstance:
   m_ObjectHideFlags: 0
