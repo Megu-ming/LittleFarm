@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -34,13 +35,15 @@ public class Player : MonoBehaviour
 
     [Header("현재 상태")]
     [SerializeField] PlayerState _currentState = PlayerState.Idle;
-    [SerializeField] int _hand = 0;
+    [SerializeField] int _hand = -1;     // 키보드 상단의 1~0 만약 도구를 들고있다면 -1
 
     // 읽기 전용 프로퍼티
     public PlayerState CurrentState => _currentState;
     public ToolData[] Tools => _tools;
     public ToolData CurrentToolData => _currentToolData;
     public int Hand => _hand;
+
+    public Action<int> HandChanged;
 
     public void SetState(PlayerState state)
     {
@@ -49,6 +52,11 @@ public class Player : MonoBehaviour
 
     public void SetHand(int index)
     {
+        if(_hand == -1)
+        {
+            Destroy(_currentToolInstance);
+            _currentToolData = null;
+        }
         if (index < 0 || index >= 10)
         { 
             _hand = 0; 
@@ -120,27 +128,35 @@ public class Player : MonoBehaviour
 
     public void EquipTool(ToolData selected)
     {
-        if (_currentToolInstance != null && selected != null)
-        {
-            Destroy(_currentToolInstance);
-            _currentToolInstance = null;
-        }
-
         _currentToolData = selected;
 
         if (_currentToolData == null)
+        {
+            if (_currentToolInstance != null)
+            {
+                Destroy(_currentToolInstance);
+                _currentToolInstance = null;
+                _currentToolData = null;
+            }
             return;
+        }
 
         if (_currentToolData.ToolPrefab == null)
+        {
+            Debug.Log("[Player] _currentToolData에 ToolPrefab이 없습니다.");
             return;
+        }
 
         if(_rightHandPropTransform == null)
         {
             Debug.LogWarning("[Player] RightHandPropTransform이 비어 있습니다.");
             return;
         }
-
+        // 도구 오브젝트 생성
         _currentToolInstance = Instantiate(_currentToolData.ToolPrefab, _rightHandPropTransform);
+        // 현재 Hand 갱신
+        _hand = -1;
+        HandChanged?.Invoke(_hand);
     }
 
     public bool TryPickupItem(int itemId, int amount)

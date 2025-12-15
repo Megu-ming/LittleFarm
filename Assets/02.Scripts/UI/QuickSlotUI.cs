@@ -30,6 +30,7 @@ public class QuickSlotUI : MonoBehaviour
             slot.Initialize(this, player, i);
         }
 
+        _player.HandChanged += UpdateHand;
         RefreshAll();
     }
 
@@ -49,6 +50,19 @@ public class QuickSlotUI : MonoBehaviour
             var stack = _inventory.GetSlot(i);
 
             slotUI.Refresh(stack, _database);
+        }
+    }
+
+    public void UpdateHand(int index)
+    {
+        if(index == -1)
+        {
+            _handTransform.gameObject.SetActive(false);
+        }
+        else
+        {
+            _handTransform.gameObject.SetActive(true);
+            _handTransform.position = _quickSlots[index].transform.position;
         }
     }
 }

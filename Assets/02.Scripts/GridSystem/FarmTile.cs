@@ -133,9 +133,6 @@ public class FarmTile : MonoBehaviour, IInteractable
     {
         if(occupant == null)
         {
-            if (!CanBeTilled)
-                return;
-
             if (context.toolType == ToolType.Hoe)
                 TillSoil();
             else if (context.toolType == ToolType.Pickaxe)
