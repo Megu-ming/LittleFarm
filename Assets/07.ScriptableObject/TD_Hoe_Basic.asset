@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2841f53827075e47924925fe3538f1e, type: 3}
+  m_Name: TD_Hoe_Basic
+  m_EditorClassIdentifier: 
+  _id: tool_Hoe_basic
+  _displayName: "\uD638\uBBF8"
+  _icon: {fileID: 21300000, guid: f9d6fa5593092bb45900bbfc92f6b2f0, type: 3}
+  _toolPrefab: {fileID: 4621275313678140330, guid: 036899a24cb283044bc360195038f61d, type: 3}
+  _toolType: 3
+  _power: 1
+  _areaSize: {x: 1, y: 1}
+  _triggerName: HoeAction

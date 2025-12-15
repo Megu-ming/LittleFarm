@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2841f53827075e47924925fe3538f1e, type: 3}
+  m_Name: TD_Pickaxe_Basic
+  m_EditorClassIdentifier: 
+  _id: tool_Pickaxe_basic
+  _displayName: "\uACE1\uAD2D\uC774"
+  _icon: {fileID: 21300000, guid: 834081df45ca33b4b9e0eeb2b102dfb4, type: 3}
+  _toolPrefab: {fileID: 1956557792844678435, guid: a401786693d5aa34796d1d936eadcca5, type: 3}
+  _toolType: 2
+  _power: 1
+  _areaSize: {x: 1, y: 1}
+  _triggerName: PickaxeAction
