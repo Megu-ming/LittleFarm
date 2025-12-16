@@ -126,19 +126,30 @@ public class Player : MonoBehaviour
             _inventoryUI.Toggle();
     }
 
+    /// <summary>
+    /// 도구 장착 (없으면 오브젝트 생성)
+    /// </summary>
+    /// <param name="selected"></param>
     public void EquipTool(ToolData selected)
     {
-        _currentToolData = selected;
-
-        if (_currentToolData == null)
+        // 들어온 데이터가 없을 때
+        if (selected == null)
         {
+            // 도구를 이미 들고있으면 제거
             if (_currentToolInstance != null)
             {
                 Destroy(_currentToolInstance);
-                _currentToolInstance = null;
+                _currentToolInstance = null;    // 데이터 정리
                 _currentToolData = null;
             }
             return;
+        }
+        // 도구 변경
+        else
+        {
+            Destroy(_currentToolInstance);  // 기존 도구 오브젝트 제거
+            _currentToolInstance = null;
+            _currentToolData = selected;        
         }
 
         if (_currentToolData.ToolPrefab == null)
