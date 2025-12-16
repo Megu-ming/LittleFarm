@@ -10,6 +10,7 @@ public class ItemDatabase : MonoBehaviour
     [Header("리소스 폴더 이름")]
     [SerializeField] string _iconResourceFolder = "ItemIcons";  // Assets/Resources/ItemIcons
     [SerializeField] string _worldResourceFolder = "ItemDrops";  // Assets/Resources/ItemDrops
+    [SerializeField] string _handResourceFolder = "ItemHandProps";  // Assets/Resources/ItemHandProps
 
     Dictionary<int, ItemSpec> _itemsById = new Dictionary<int, ItemSpec>();
     Dictionary<string, ItemSpec> _itemsByKey = new Dictionary<string, ItemSpec>();
@@ -20,6 +21,7 @@ public class ItemDatabase : MonoBehaviour
 
         LinkIconSprites();                   // 아이콘 스프라이트 연결
         LinkWorldPrefabs();                  // 월드 드랍 프리팹 연결
+        LinkHandPrefabs();                   // 아이템 핸드 프리팹 연결
     }
 
     public ItemSpec GetById(int id)
@@ -111,7 +113,8 @@ public class ItemDatabase : MonoBehaviour
                 sellPrice = GetInt(cols, "sellPrice", 0),
                 iconKey = GetString(cols, "iconKey", ""),
                 worldKey = GetString(cols, "worldKey", ""),
-                toolKey = GetString(cols, "toolKey", "")
+                toolKey = GetString(cols, "toolKey", ""),
+                handKey = GetString(cols, "handKey", "")
             };
 
             _itemsById[spec.id] = spec;
@@ -220,5 +223,50 @@ public class ItemDatabase : MonoBehaviour
         }
 
         Debug.Log($"[ItemDatabase] 월드 프리팹 연결 완료: {linked}개");
+    }
+
+    void LinkHandPrefabs()
+    {
+        GameObject[] prefabs = Resources.LoadAll<GameObject>(_handResourceFolder);
+        if (prefabs == null || prefabs.Length == 0)
+        {
+            Debug.LogWarning($"[ItemDatabase] Resources/{_handResourceFolder} 에서 프리팹을 찾지 못했습니다.");
+            return;
+        }
+
+        var prefabByName = new Dictionary<string, GameObject>(StringComparer.OrdinalIgnoreCase);
+        foreach (var go in prefabs)
+        {
+            if (go == null) continue;
+            prefabByName[go.name] = go;
+        }
+
+        int linked = 0;
+
+        foreach (var kv in _itemsById)
+        {
+            ItemSpec spec = kv.Value;
+            if (spec == null) continue;
+
+            string handKey = !string.IsNullOrEmpty(spec.handKey) ? spec.handKey : spec.key;
+            if (string.IsNullOrEmpty(handKey)) continue;
+
+            if (prefabByName.TryGetValue(handKey, out var go))
+            {
+                spec.handPrefab = go;
+                linked++;
+            }
+            else
+            {
+                string alt = handKey + "_prefab";
+                if (prefabByName.TryGetValue(alt, out go))
+                {
+                    spec.handPrefab = go;
+                    linked++;
+                }
+            }
+        }
+
+        Debug.Log($"[ItemDatabase] 핸드 프리팹 연결 완료: {linked}개");
     }
 }

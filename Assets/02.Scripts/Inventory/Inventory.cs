@@ -1,21 +1,26 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    [Header("½½·Ô ¼³Á¤")]
+    [Header("ìŠ¬ë¡¯ ì„¤ì •")]
     [SerializeField] int _maxSlotCount = 30;
     [SerializeField] int _initialUnlocked = 10;
     [SerializeField] ItemStack[] _slots;
 
-    [Header("µğ¹ö±× È®ÀÎ¿ë")]
+    [Header("ë””ë²„ê·¸ í™•ì¸ìš©")]
     [SerializeField] int _unlockedSlots;
 
     public int SlotCount => _maxSlotCount;
     public IReadOnlyList<ItemStack> Slots => _slots;
     public int UnlockedSlots => _unlockedSlots;
 
-    ItemDatabase _database;
+    private ItemDatabase _database;
+    public ItemDatabase Database => _database;
+
+    /// <summary>ìŠ¬ë¡¯ ë‚´ìš©ì´ ë°”ë€Œë©´ í˜¸ì¶œë¨(index)/// </summary>
+    public event Action<int> SlotChanged;
 
     public void Initialize(ItemDatabase database)
     {
@@ -33,10 +38,6 @@ public class Inventory : MonoBehaviour
         _unlockedSlots = Mathf.Clamp(_initialUnlocked, 0, _maxSlotCount);
     }
 
-    /// <summary>
-    /// ÀÎµ¦½º·Î ½½·Ô ÂüÁ¶ °¡Á®¿À±â
-    /// </summary>
-    /// <returns></returns>
     public ItemStack GetSlot(int index)
     {
         if (index < 0 || index >= _slots.Length)
@@ -44,10 +45,6 @@ public class Inventory : MonoBehaviour
         return _slots[index];
     }
 
-    /// <summary>
-    /// Æ¯Á¤ ¾ÆÀÌÅÛÀÇ ÃÑ ¼ö·®À» ±¸ÇÏ´Â ÇÔ¼ö
-    /// </summary>
-    /// <returns></returns>
     public int GetTotalCount(int itemId)
     {
         int total = 0;
@@ -59,11 +56,6 @@ public class Inventory : MonoBehaviour
         return total;
     }
 
-    /// <summary>
-    /// itemId ¾ÆÀÌÅÛÀ» amount°³ Ãß°¡ ½Ãµµ
-    /// ¸ğµÎ µé¾î°¡¸é true, ÀÏºÎ¶óµµ ¸øµé¾î°¡¸é false
-    /// </summary>
-    /// <returns></returns>
     public bool TryAddItem(int itemId, int amount, out int remainder)
     {
         remainder = amount;
@@ -71,7 +63,7 @@ public class Inventory : MonoBehaviour
 
         if(_database == null)
         {
-            Debug.LogWarning("[Inventory] ItemDatabase°¡ ¾ø½À´Ï´Ù");
+            Debug.LogWarning("[Inventory] ItemDatabaseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
             return false;
         }
 
@@ -84,7 +76,6 @@ public class Inventory : MonoBehaviour
 
         int maxStack = Mathf.Max(1, spec.maxStack);
 
-        // °°Àº ¾ÆÀÌÅÛÀÌ ÀÖ´Â ½½·Ô¿¡ ¸ÕÀú Ã¤¿ì±â
         for(int i=0;i<_unlockedSlots && remainder>0;i++)
         {
             var slot = _slots[i];
@@ -97,9 +88,10 @@ public class Inventory : MonoBehaviour
             int toAdd = Mathf.Min(canAdd, remainder);
             slot.Add(toAdd);
             remainder -= toAdd;
+
+            SlotChanged?.Invoke(i);
         }
 
-        // ³²Àº ¼ö·®À» ¿­¸° ½½·Ô Áß ºó ½½·Ô¿¡ ³Ö±â
         for(int i =0;i<_unlockedSlots && remainder > 0;i++)
         {
             var slot = _slots[i];
@@ -108,16 +100,13 @@ public class Inventory : MonoBehaviour
             int toAdd = Mathf.Min(maxStack, remainder);
             slot.Set(itemId, toAdd);
             remainder -= toAdd;
+
+            SlotChanged?.Invoke(i);
         }
 
         return remainder == 0;
     }
 
-    /// <summary>
-    /// itemId ¾ÆÀÌÅÛÀ» amount°³ Á¦°Å ½Ãµµ
-    /// ¸ğµÎ Á¦°ÅÇÏ¸é true, ºÎÁ·ÇÏ¸é false
-    /// </summary>
-    /// <returns></returns>
     public bool TryRemoveItem(int itemId, int amount)
     {
         if (amount <= 0) return true;
@@ -142,15 +131,13 @@ public class Inventory : MonoBehaviour
                 slot.Remove(remaining);
                 remaining = 0;
             }
+
+            SlotChanged?.Invoke(i);
         }
 
         return true;
     }
 
-    /// <summary>
-    /// itemId¸¦ ÃÖ¼Ò amount°³ ÀÌ»ó °¡Áö°í ÀÖ´ÂÁö ¿©ºÎ
-    /// </summary>
-    /// <returns></returns>
     public bool HasEnough(int itemId, int amount)
     {
         return GetTotalCount(itemId) >= amount;

@@ -1,9 +1,9 @@
-id,key,name,desc,category,maxStack,buyPrice,sellPrice,iconKey,worldKey,toolKey
-1001,WOOD,나무,목재로 쓸 수 있다,Resource,99,50,10,ICON_WOOD,DROP_WOOD,
-1002,STONE,돌,기본적인 건축 자재이다,Resource,99,75,15,ICON_STONE,DROP_STONE,
-2001,AXE_ITEM,도끼,나무를 벨 수 있는 도구,Tool,1,0,0,ICON_AXE,DROP_AXE,AXE_01
-2002,PICK_ITEM,곡괭이,돌과 광석을 캘 수 있는 도구,Tool,1,0,0,ICON_PICKAXE,DROP_PICKAXE,PICKAXE_01
-3001,POTATO_SEED,감자 씨앗,감자를 심을 수 있는 씨앗이다,Seed,99,50,25,ICON_POTATO_SEED,DROP_POTATO_SEED,
-3002,POTATO,감자,수확한 감자다,Crop,99,0,60,ICON_POTATO,DROP_POTATO,
-3003,CARROT_SEED,당근 씨앗,당근을 심을 수 있는 씨앗이다,Seed,99,50,25,ICON_CARROT_SEED,DROP_CARROT_SEED,
-3004,CARROT,당근,수확한 당근이다,Crop,99,0,60,ICON_CARROT,DROP_CARROT,
+id,key,name,desc,category,maxStack,buyPrice,sellPrice,iconKey,worldKey,toolKey,handKey
+1001,WOOD,나무,목재로 쓸 수 있다,Resource,99,50,10,ICON_WOOD,DROP_WOOD,,HAND_WOOD,
+1002,STONE,돌,기본적인 건축 자재이다,Resource,99,75,15,ICON_STONE,DROP_STONE,,HAND_STONE,
+2001,AXE_ITEM,도끼,나무를 벨 수 있는 도구,Tool,1,0,0,ICON_AXE,DROP_AXE,AXE_01,
+2002,PICK_ITEM,곡괭이,돌과 광석을 캘 수 있는 도구,Tool,1,0,0,ICON_PICKAXE,DROP_PICKAXE,PICKAXE_01,
+3001,POTATO_SEED,감자 씨앗,감자를 심을 수 있는 씨앗이다,Seed,99,50,25,ICON_POTATO_SEED,DROP_POTATO_SEED,HAND_POTATO_SEED,
+3002,POTATO,감자,수확한 감자다,Crop,99,0,60,ICON_POTATO,DROP_POTATO,HAND_POTATO,
+3003,CARROT_SEED,당근 씨앗,당근을 심을 수 있는 씨앗이다,Seed,99,50,25,ICON_CARROT_SEED,DROP_CARROT_SEED,HAND_CARROT_SEED,
+3004,CARROT,당근,수확한 당근이다,Crop,99,0,60,ICON_CARROT,DROP_CARROT,HAND_CARROT,

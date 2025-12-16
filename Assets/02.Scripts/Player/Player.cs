@@ -32,6 +32,13 @@ public class Player : MonoBehaviour
     [Tooltip("현재 들고 있는 도구")]
     [SerializeField] GameObject _currentToolInstance;
     [SerializeField] ToolData _currentToolData;
+    [Header("손 아이템 Props")]
+    [Tooltip("아이템을 들고 있는 오른손 트랜스폼")]
+    [SerializeField] Transform _rightHandItemPropTransform;
+    [Tooltip("현재 들고 있는 아이템")]
+    [SerializeField] GameObject _currentHandItemInstance;
+    [SerializeField] int _currentHandItemId = -1;
+    [SerializeField] int _lastItemHand = 0;
 
     [Header("현재 상태")]
     [SerializeField] PlayerState _currentState = PlayerState.Idle;
@@ -52,17 +59,18 @@ public class Player : MonoBehaviour
 
     public void SetHand(int index)
     {
-        if(_hand == -1)
-        {
-            Destroy(_currentToolInstance);
-            _currentToolData = null;
-        }
         if (index < 0 || index >= 10)
-        { 
-            _hand = 0; 
-            return; 
-        }
+            return;
+
+        // 도구 상태(-1)에서 아이템으로 전환하면 도구 프롭 제거
+        if (_hand == -1)
+            ClearToolVisual();
+
         _hand = index;
+        _lastItemHand = index;
+
+        HandChanged?.Invoke(_hand);
+        RefreshHandItemProp();
     }
 
     public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, QuickSlotUI quickSlotUI)
@@ -75,6 +83,11 @@ public class Player : MonoBehaviour
         _inventoryUI = inventoryUI;
         _quickSlotUI = quickSlotUI;
         _toolChangerUI = toolChangerUI;
+
+        if (_inventory != null)
+            _inventory.SlotChanged += OnInventorySlotChanged;
+
+        RefreshHandItemProp();
     }
 
     private void Update()
@@ -132,25 +145,28 @@ public class Player : MonoBehaviour
     /// <param name="selected"></param>
     public void EquipTool(ToolData selected)
     {
-        // 들어온 데이터가 없을 때
+        // 도구 해제
         if (selected == null)
         {
-            // 도구를 이미 들고있으면 제거
-            if (_currentToolInstance != null)
-            {
-                Destroy(_currentToolInstance);
-                _currentToolInstance = null;    // 데이터 정리
-                _currentToolData = null;
-            }
+            ClearToolVisual();
+
+            // 도구 상태였다면 마지막 아이템 슬롯로 복귀
+            if (_hand == -1)
+                SetHand(_lastItemHand);
+
             return;
         }
-        // 도구 변경
-        else
-        {
-            Destroy(_currentToolInstance);  // 기존 도구 오브젝트 제거
-            _currentToolInstance = null;
-            _currentToolData = selected;        
-        }
+
+        // 아이템 들고 있던 상태라면 복귀 인덱스 저장
+        if (_hand != -1)
+            _lastItemHand = _hand;
+
+        // 아이템 프롭 제거(도구랑 동시에 보이지 않게)
+        ClearHandItemProp();
+
+        // 기존 도구 제거 후 교체
+        ClearToolVisual();
+        _currentToolData = selected;
 
         if (_currentToolData.ToolPrefab == null)
         {
@@ -158,15 +174,15 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if(_rightHandPropTransform == null)
+        if (_rightHandPropTransform == null)
         {
             Debug.LogWarning("[Player] RightHandPropTransform이 비어 있습니다.");
             return;
         }
-        // 도구 오브젝트 생성
+
         _currentToolInstance = Instantiate(_currentToolData.ToolPrefab, _rightHandPropTransform);
-        // 현재 Hand 갱신
-        _hand = -1;
+
+        _hand = -1;                 
         HandChanged?.Invoke(_hand);
     }
 
@@ -184,4 +200,78 @@ public class Player : MonoBehaviour
 
         return allAdded && remainder == 0;
     }
+
+    void OnInventorySlotChanged(int slotIndex)
+    {
+        // 현재 손이 가리키는 슬롯이 바뀌면 손 프롭도 갱신
+        if (_hand == slotIndex)
+            RefreshHandItemProp();
+    }
+
+    void RefreshHandItemProp()
+    {
+        if (_hand < 0)
+        {
+            ClearHandItemProp();
+            return;
+        }
+
+        if (_inventory == null || _inventory.Database == null)
+        {
+            ClearHandItemProp();
+            return;
+        }
+
+        var slot = _inventory.GetSlot(_hand);
+        if (slot == null || slot.IsEmpty)
+        {
+            ClearHandItemProp();
+            return;
+        }
+
+        var spec = _inventory.Database.GetById(slot.ItemId);
+        if (spec == null || spec.handPrefab == null)
+        {
+            ClearHandItemProp();
+            return;
+        }
+
+        if (_rightHandItemPropTransform == null)
+        {
+            Debug.LogWarning("[Player] _rightHandItemPropTransform이 비어 있습니다.");
+            return;
+        }
+
+        // 같은 아이템이면 재생성하지 않음
+        if (_currentHandItemInstance != null && _currentHandItemId == slot.ItemId)
+            return;
+
+        ClearHandItemProp();
+
+        _currentHandItemInstance = Instantiate(spec.handPrefab, _rightHandItemPropTransform);
+        _currentHandItemInstance.transform.localPosition = Vector3.zero;
+        _currentHandItemInstance.transform.localRotation = Quaternion.identity;
+        _currentHandItemInstance.transform.localScale = Vector3.one;
+
+        _currentHandItemId = slot.ItemId;
+    }
+
+    void ClearHandItemProp()
+    {
+        if (_currentHandItemInstance != null)
+            Destroy(_currentHandItemInstance);
+
+        _currentHandItemInstance = null;
+        _currentHandItemId = -1;
+    }
+
+    void ClearToolVisual()
+    {
+        if (_currentToolInstance != null)
+            Destroy(_currentToolInstance);
+
+        _currentToolInstance = null;
+        _currentToolData = null;
+    }
+
 }

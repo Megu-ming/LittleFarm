@@ -32,6 +32,8 @@ public class QuickSlotUI : MonoBehaviour
 
         _player.HandChanged += UpdateHand;
         RefreshAll();
+
+        UpdateHand(_player.Hand);
     }
 
     public void RefreshAll()

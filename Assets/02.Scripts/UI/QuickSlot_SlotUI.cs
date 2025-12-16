@@ -25,7 +25,7 @@ public class QuickSlot_SlotUI : MonoBehaviour
 
     public void SetHandPosition(bool value)
     {
-        _owner.UpdateHand(_index);
+        if (!value) return;
         _player.SetHand(_index);
     }
 

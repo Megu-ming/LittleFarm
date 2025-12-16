@@ -14,9 +14,12 @@ public class ItemSpec
     public string iconKey;
     public string worldKey;
     public string toolKey;
+    public string handKey;
 
     public Sprite iconSprite;
     public GameObject worldPrefab;
+
+    public GameObject handPrefab;
 
     public ToolData toolData;
 
