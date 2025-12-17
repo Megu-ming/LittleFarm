@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 /// <summary>
 /// 입력 인스펙터 연결 담당
@@ -99,6 +100,7 @@ public class Player : MonoBehaviour
             _interaction.OnInteract();
     }
 
+    #region Input Actions
     public void OnMove(InputAction.CallbackContext context)
     {
         _controller.Move(context.ReadValue<Vector2>());
@@ -138,6 +140,56 @@ public class Player : MonoBehaviour
         if (_inventoryUI != null)
             _inventoryUI.Toggle();
     }
+
+    public void OnQuickSlotSelect(InputAction.CallbackContext context)
+    {
+        if(!context.performed) return;
+
+        if (context.control is not KeyControl keyControl) return;
+
+        int handIndex = KeyToHandIndex(keyControl.keyCode);
+        if (handIndex < 0) return;
+
+        SetHand(handIndex);
+    }
+
+    int KeyToHandIndex(Key key)
+    {
+        switch (key)
+        {
+            case Key.Digit1: return 0;
+            case Key.Digit2: return 1;
+            case Key.Digit3: return 2;
+            case Key.Digit4: return 3;
+            case Key.Digit5: return 4;
+            case Key.Digit6: return 5;
+            case Key.Digit7: return 6;
+            case Key.Digit8: return 7;
+            case Key.Digit9: return 8;
+            case Key.Digit0: return 9;
+        }
+
+        return -1;
+    }
+
+    public void OnQuickSlotScroll(InputAction.CallbackContext context)
+    {
+        if(!context.performed) return;
+
+        Vector2 scroll = context.ReadValue<Vector2>();
+        float y = scroll.y;
+
+        if (Mathf.Abs(y) < 0.01f) return;
+
+        int dir = (y < 0f) ? 1 : -1;
+
+        int baseIndex = (_hand == -1) ? _lastItemHand : _hand;
+        int nextIndex = (baseIndex + dir) % 10;
+        if (nextIndex < 0) nextIndex += 10;
+        
+        SetHand(nextIndex);
+    }
+    #endregion
 
     /// <summary>
     /// 도구 장착 (없으면 오브젝트 생성)
@@ -273,5 +325,4 @@ public class Player : MonoBehaviour
         _currentToolInstance = null;
         _currentToolData = null;
     }
-
 }
