@@ -68,6 +68,8 @@ public class FarmTile : MonoBehaviour, IInteractable
     // 점유자 해제
     public void ClearOccupant()
     {
+        //if(occupant != null)
+        //    DestroyImmediate(occupant);
         used = false;
         occupant = null;
     }
@@ -150,6 +152,7 @@ public class FarmTile : MonoBehaviour, IInteractable
     void TillSoil()
     {
         TileType = TileType.Tilled;
+        _isTilled = true;
         Debug.Log($"[FarmTile]{name} 경작 완료");
     }
 
@@ -172,6 +175,7 @@ public class FarmTile : MonoBehaviour, IInteractable
         if (_tileType == TileType.Tilled)
         {
             TileType = TileType.Watered;
+            _isTilled = true;
             Debug.Log($"[FarmTile]{name} 물주기 완료");
         }
     }
@@ -206,7 +210,7 @@ public class FarmTile : MonoBehaviour, IInteractable
 
     public void Interact(PlayerInteraction interactor)
     {
-        if(CanPlantSeed && !_hasCrop)
-            TryPlantSeed(3001, 3);
+        //if(CanPlantSeed && !_hasCrop)
+        //    TryPlantSeed(3001, 3);
     }
 }   

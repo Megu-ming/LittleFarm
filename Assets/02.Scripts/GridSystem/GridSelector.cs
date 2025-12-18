@@ -76,10 +76,13 @@ public class GridSelector : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = cam.ScreenPointToRay(mousePos);
-        Gizmos.DrawSphere(ray.origin, 0.1f);
-        Gizmos.DrawRay(ray);
+        if (Mouse.current != null)
+        {
+            Vector2 mousePos = Mouse.current.position.ReadValue();
+            Ray ray = cam.ScreenPointToRay(mousePos);
+            Gizmos.DrawSphere(ray.origin, 0.1f);
+            Gizmos.DrawRay(ray);
+        }
     }
 
     /// <summary>

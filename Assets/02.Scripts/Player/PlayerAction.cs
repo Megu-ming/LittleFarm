@@ -21,13 +21,19 @@ public class PlayerAction : MonoBehaviour
     {
         if (_player.CurrentState == PlayerState.Acting) return;
 
-        var tool = CurrentTool;
-        if (tool == null || tool.ToolType == ToolType.None) return;
-
         _cachedActionTile = _gridSelector != null ? _gridSelector.CurrentTile : null;
+        if(_cachedActionTile == null) return;
+
         FaceActionTarget();
-        if (!string.IsNullOrEmpty(tool.TriggerName))
-            _animator.SetTrigger(tool.TriggerName);
+
+        var tool = CurrentTool;
+        if (tool != null && tool.ToolType != ToolType.None)
+        {
+            if (!string.IsNullOrEmpty(tool.TriggerName))
+                _animator.SetTrigger(tool.TriggerName);
+        }
+
+        _player.TryUseItem(_cachedActionTile);
     }
 
     /// <summary>

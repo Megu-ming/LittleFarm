@@ -138,6 +138,22 @@ public class Inventory : MonoBehaviour
         return true;
     }
 
+    public bool TryConsumeFromSlot(int slotIndex, int amount)
+    {
+        if (amount <= 0) return true;
+        if (slotIndex < 0 || slotIndex >= _slots.Length) return false;
+
+        var slot = _slots[slotIndex];
+        if (slot == null || slot.IsEmpty) return false;
+        if (slot.Count < amount) return false;
+
+        if (slot.Count == amount) slot.Clear();
+        else slot.Remove(amount);
+
+        SlotChanged?.Invoke(slotIndex);
+        return true;
+    }
+
     public bool HasEnough(int itemId, int amount)
     {
         return GetTotalCount(itemId) >= amount;

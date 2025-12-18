@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [Header("외부 참조")]
     [SerializeField] GridSelector _gridSelector;
     [SerializeField] ToolChangerUI _toolChangerUI;
+    [SerializeField] CropManager _cropManager;
 
     [Header("내부 참조")]
     [SerializeField] CharacterController _characterController;
@@ -19,7 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField] PlayerAction _action;
     [SerializeField] PlayerInteraction _interaction;
     [SerializeField] Animator _animator;
-    [SerializeField] PlayerItemMagnet _itemMagnet;
+    [SerializeField] PlayerItemMagnet _itemMagnet;    
 
     [Header("인벤토리")]
     [SerializeField] Inventory _inventory;
@@ -253,6 +254,62 @@ public class Player : MonoBehaviour
         return allAdded && remainder == 0;
     }
 
+    public bool TryUseItem(FarmTile targetTile)
+    {
+        if (_hand < 0) return false;
+        if (_inventory == null || _inventory.Database == null) return false;
+
+        var slot = _inventory.GetSlot(_hand);
+        if (slot == null || slot.IsEmpty) return false;
+
+        int itemId = slot.ItemId;
+        var spec = _inventory.Database.GetById(itemId);
+        if (spec == null) return false;
+
+        bool used = false;
+
+        switch (spec.category)
+        {
+            case ItemCategory.Seed:
+                used = TryUseSeed(itemId, targetTile);
+                break;
+            // case ItemCategory.Food: ...
+            // case ItemCategory.Resource: ...
+            default:
+                used = false;
+                break;
+        }
+
+        if (!used) return false;
+
+        bool consumed = _inventory.TryConsumeFromSlot(_hand, 1);
+        if (!consumed) return false;
+
+        if (_inventoryUI != null && _quickSlotUI != null)
+        {
+            _inventoryUI.RefreshAll();
+            _quickSlotUI.RefreshAll();
+        }
+
+        return true;
+    }
+
+    bool TryUseSeed(int seedItemId, FarmTile targetTile)
+    {
+        if (targetTile == null) return false;
+
+        // 씨앗은 “경작된 타일”에서만
+        if (!targetTile.CanPlantSeed) return false;
+
+        if (_cropManager == null)
+        {
+            // CropManager 없으면 논리만 심기(비주얼 없음)
+            return targetTile.TryPlantSeed(seedItemId, 3);
+        }
+
+        return _cropManager.PlantSeed(targetTile, seedItemId, 3);
+    }
+
     void OnInventorySlotChanged(int slotIndex)
     {
         // 현재 손이 가리키는 슬롯이 바뀌면 손 프롭도 갱신
@@ -301,9 +358,6 @@ public class Player : MonoBehaviour
         ClearHandItemProp();
 
         _currentHandItemInstance = Instantiate(spec.handPrefab, _rightHandItemPropTransform);
-        _currentHandItemInstance.transform.localPosition = Vector3.zero;
-        _currentHandItemInstance.transform.localRotation = Quaternion.identity;
-        _currentHandItemInstance.transform.localScale = Vector3.one;
 
         _currentHandItemId = slot.ItemId;
     }
