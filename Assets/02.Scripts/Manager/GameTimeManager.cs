@@ -36,6 +36,9 @@ public class GameTimeManager : MonoBehaviour
     public int Day => _day;
     public int Hour => _hour;
     public int Minute => _minute;
+    public int DayStartHour => _dayStartHour;
+    public int DayEndHour => _dayEndHour;
+
 
     /// <summary>오늘이 진행 가능한 시간대인지 (06:00 ~ 다음날 02:00)</summary>
     public bool IsPlayableTime
@@ -149,6 +152,22 @@ public class GameTimeManager : MonoBehaviour
         OnDateChanged?.Invoke(_year, _season, _day);
     }
 
+    /// <summary>
+    /// 06:00(0) ~ 다음날 02:00(1) 기준으로 현재 시간 진행도를 0~1로 반환
+    /// </summary>
+    public float GetDayProgress01()
+    {
+        int startMinutes = _dayStartHour * 60;
+        int endMinutes = (_dayEndHour + 24) * 60; // 다음날로 취급
+
+        int h = _hour;
+        if (h < _dayStartHour) h += 24; // 0~5시는 다음날로 취급
+
+        int currentMinutes = (h * 60) + _minute;
+
+        return Mathf.Clamp01(Mathf.InverseLerp(startMinutes, endMinutes, currentMinutes));
+    }
+
     // 디버그용: 지금 시간을 문자열로
     public string GetTimeText()
     {
@@ -166,4 +185,11 @@ public class GameTimeManager : MonoBehaviour
         }
         return s.ToString();
     }
+
+    #region Testing
+    public void MoveToNextDayTest()
+    {
+        ForceNextDay();
+    }
+    #endregion
 }
