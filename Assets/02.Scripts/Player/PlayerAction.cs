@@ -75,7 +75,6 @@ public class PlayerAction : MonoBehaviour
         if (target == null)
             return false;
 
-        Vector3 hitPoint = target.transform.position;
         Vector3 hitNormal = Vector3.up;
 
         var ctx = new ToolActionContext
@@ -83,7 +82,7 @@ public class PlayerAction : MonoBehaviour
             user = this,
             toolType = tool.ToolType,
             power = tool.Power,
-            hitPoint = hitPoint,
+            hitTile = target,
             hitNormal = hitNormal
         };
         

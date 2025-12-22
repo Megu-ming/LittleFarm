@@ -18,7 +18,7 @@ public enum TileType
 }
 
 [Serializable]
-public class FarmTile : MonoBehaviour, IInteractable
+public class FarmTile : MonoBehaviour, IInteractable, IToolTarget
 {
     [Header("그리드 좌표")]
     [SerializeField] Vector2Int _gridPos;
@@ -58,6 +58,9 @@ public class FarmTile : MonoBehaviour, IInteractable
     public bool CanBeTilled => _tileType == TileType.Ground || _tileType == TileType.Tilled;
     public bool CanPlantSeed => _isTilled && !_hasCrop;
     public bool IsWalkable => _tileType != TileType.Block && _tileType != TileType.Water;
+    public int CropItemId => _cropItemId;
+    public int GrowthStage => _growthStage;
+    public int MaxGrowthStage => _maxGrowthStage;
 
     // 점유자 설정
     public void SetOccupant(GameObject obj)
@@ -133,6 +136,7 @@ public class FarmTile : MonoBehaviour, IInteractable
     /// <param name="context"></param>
     public void OnToolAction(ToolActionContext context)
     {
+        // 뭔가 설치되어있지 않을 때
         if(occupant == null)
         {
             if (context.toolType == ToolType.Hoe)
@@ -142,10 +146,20 @@ public class FarmTile : MonoBehaviour, IInteractable
             else if (context.toolType == ToolType.WateringCan)
                 WaterSoil();
         }
+        // 뭔가 설치되어 있음
         else
         {
+            if(occupant.TryGetComponent<SeedToolTarget>(out var seed))
+            {
+                if (context.toolType == ToolType.WateringCan)
+                { 
+                    WaterSoil();
+                    return;
+                }
+            }
             var target = occupant.GetComponent<IToolTarget>();
-            target.OnToolAction(context);
+            if(target != null)
+                target.OnToolAction(context);
         }
     }
 
@@ -175,6 +189,7 @@ public class FarmTile : MonoBehaviour, IInteractable
         if (_tileType == TileType.Tilled)
         {
             TileType = TileType.Watered;
+            _wateredToday = true;
             _isTilled = true;
             Debug.Log($"[FarmTile]{name} 물주기 완료");
         }
@@ -195,17 +210,39 @@ public class FarmTile : MonoBehaviour, IInteractable
         return true;
     }
 
-    public void AdvancedGrowthOneDay()
+    public bool TryAdvancedGrowthOneDay()
     {
-        if (!_hasCrop) return;
-        if (_growthStage >= _maxGrowthStage) return;
+        if (!_hasCrop) return false;
+        if (!_wateredToday) return false;
+        // 성장이 끝나면 오브젝트 Crop으로 교체
+        if (_growthStage >= _maxGrowthStage)
+        {
+            _wateredToday = false;
+            if (TileType == TileType.Watered) TileType = TileType.Tilled;
+            return false;
+        }
 
-        if(_wateredToday)
-            _growthStage++;
+        _growthStage++;
+        _wateredToday = false;
+
+        if (TileType == TileType.Watered) TileType = TileType.Tilled;
+        Debug.Log($"[FarmTile] {name} 성장 단계 : {_growthStage}/{_maxGrowthStage}");
 
         // TODO:
-        // 작물 성장 이벤트 호출
-        Debug.Log($"[FarmTile] {name} 성장 단계 : {_growthStage}/{_maxGrowthStage}");
+        // 작물 성장 이벤트 호출 (성장 단계에 맞는 외형으로 오브젝트 변경)
+        return true;
+    }
+
+    public void ClearCropState(bool keepTilled = true)
+    {
+        _hasCrop = false;
+        _cropItemId = -1;
+        _growthStage = 0;
+        _maxGrowthStage = 0;
+        _wateredToday = false;
+
+        if (keepTilled && TileType == TileType.Watered)
+            TileType = TileType.Tilled;
     }
 
     public void Interact(PlayerInteraction interactor)

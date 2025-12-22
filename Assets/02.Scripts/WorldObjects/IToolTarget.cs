@@ -5,7 +5,7 @@ public struct ToolActionContext
     public PlayerAction user;
     public ToolType toolType;
     public float power;
-    public Vector3 hitPoint;
+    public FarmTile hitTile;
     public Vector3 hitNormal;
 }
 

@@ -11,6 +11,8 @@ public class CropManager : MonoBehaviour
     public class SeedVisual
     {
         public int _seedItemId;
+        public GameObject[] _stagePrefabs;
+        public GameObject _grownPrefab;
         public GameObject _plantedPrefab;
         public Vector3 _offset = new Vector3(0, 0.05f, 0);
     }
@@ -20,7 +22,7 @@ public class CropManager : MonoBehaviour
     [SerializeField] GameObject _defaultPlantedPrefab;
 
     GameTimeManager _timeManager;
-    readonly List<FarmTile> _tiles = new List<FarmTile>();
+    private readonly HashSet<FarmTile> _plantedTiles = new HashSet<FarmTile>();
     Dictionary<int, SeedVisual> _seedVisualById;
 
     public void Initialize(GameTimeManager timeManager, GridManager gridManager)
@@ -28,18 +30,6 @@ public class CropManager : MonoBehaviour
         _timeManager = timeManager;
 
         _timeManager.OnDateChanged += HandleNewDay;
-
-        _tiles.Clear();
-
-        var tiles = gridManager.Tiles;
-        if(tiles!=null)
-        {
-            int width  = tiles.GetLength(0);
-            int height = tiles.GetLength(1);
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    _tiles.Add(tiles[x, y]);
-        }
 
         _seedVisualById = new Dictionary<int, SeedVisual>();
         foreach(var v in _seedVisuals)
@@ -52,10 +42,29 @@ public class CropManager : MonoBehaviour
 
     void HandleNewDay(int year, Season season, int day)
     {
-        foreach(var tile in _tiles)
+        if (_plantedTiles.Count == 0) return;
+
+        var snapshot = new List<FarmTile>(_plantedTiles);
+
+        foreach (var tile in snapshot)
         {
-            if (tile != null)
-                tile.AdvancedGrowthOneDay();
+            if (tile == null) { _plantedTiles.Remove(tile); continue; }
+            if (!tile.HasCrop) { _plantedTiles.Remove(tile); continue; }
+
+            bool grew = tile.TryAdvancedGrowthOneDay();
+            if (!grew) continue; // 물 안 줬으면 외형도 그대로
+
+            // 성장 단계에 따른 외형 교체
+            if (tile.GrowthStage >= tile.MaxGrowthStage)
+            {
+                ConvertToGrownCrop(tile);
+                // 지금은 완성 후 성장 더 안 하니까 목록에서 제거(재성장 작물 넣을 때는 유지)
+                _plantedTiles.Remove(tile);
+            }
+            else
+            {
+                SpawnVisualForStage(tile, tile.GrowthStage, tile.CropItemId);
+            }
         }
     }
 
@@ -64,31 +73,72 @@ public class CropManager : MonoBehaviour
         if(tile == null) return false;
         if (!tile.TryPlantSeed(seedItemId, maxGrouthDays)) return false;
 
-        if (tile.occupant != null) Destroy(tile.occupant);
+        _plantedTiles.Add(tile); // ★ 심어진 타일만 관리
+
+        SpawnVisualForStage(tile, stage: 0, seedItemId);
+        return true;
+    }
+
+    private void SpawnVisualForStage(FarmTile tile, int stage, int seedItemId)
+    {
+        if (tile.occupant != null)
+            Destroy(tile.occupant);
 
         GameObject prefab = _defaultPlantedPrefab;
+        Vector3 offset = Vector3.zero;
 
-        if (_seedVisualById != null && _seedVisualById.TryGetValue(seedItemId, out var visual))
+        if (_seedVisualById != null && _seedVisualById.TryGetValue(seedItemId, out var v))
         {
-            if (visual._plantedPrefab != null)
-                prefab = visual._plantedPrefab;
+            offset = v._offset;
+
+            // 1) stage 프리팹 우선
+            if (v._stagePrefabs != null && stage >= 0 && stage < v._stagePrefabs.Length && v._stagePrefabs[stage] != null)
+                prefab = v._stagePrefabs[stage];
+            // 2) 없으면 기존 plantedPrefab
+            else if (v._plantedPrefab != null)
+                prefab = v._plantedPrefab;
         }
 
         if (prefab == null)
         {
-            Debug.LogWarning("[CropManager] planted prefab이 없습니다. (default도 null)");
-            return true;
+            tile.ClearOccupant();
+            return;
         }
 
-        Vector3 spawnPos = tile.transform.position;
+        var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
+        tile.SetOccupant(obj);
+    }
+
+    private void ConvertToGrownCrop(FarmTile tile)
+    {
+        int seedItemId = tile.CropItemId;
+
+        GameObject prefab = null;
         Vector3 offset = Vector3.zero;
 
-        if (_seedVisualById != null && _seedVisualById.TryGetValue(seedItemId, out var v2))
-            offset = v2._offset;
+        if (_seedVisualById != null && _seedVisualById.TryGetValue(seedItemId, out var v))
+        {
+            offset = v._offset;
+            prefab = v._grownPrefab;
+            // grownPrefab이 없으면 마지막 stage 프리팹을 대체로 사용 가능
+            if (prefab == null && v._stagePrefabs != null && v._stagePrefabs.Length > 0)
+                prefab = v._stagePrefabs[^1];
+        }
 
-        var obj = Instantiate(prefab, spawnPos + offset, Quaternion.identity);
-        tile.SetOccupant(obj); // used/occupant 동기화
+        if (tile.occupant != null)
+            Destroy(tile.occupant);
 
-        return true;
+        if (prefab == null)
+        {
+            // 완성 프리팹이 없으면 그냥 비주얼 제거(원하면 경고)
+            tile.ClearOccupant();
+            return;
+        }
+
+        var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
+        tile.SetOccupant(obj);
+
+        // TODO: 여기서 CropToolTarget(수확) 같은 컴포넌트 연결하면 됨
     }
+
 }

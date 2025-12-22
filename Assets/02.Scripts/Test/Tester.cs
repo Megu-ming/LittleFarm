@@ -6,6 +6,6 @@ public class Tester : MonoBehaviour
 
     public void AddPotatoButton()
     {
-        player.TryPickupItem(3002, 10);
+        player.TryPickupItem(3001, 10);
     }
 }

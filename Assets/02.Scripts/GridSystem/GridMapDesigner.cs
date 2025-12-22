@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridMapDesigner : MonoBehaviour
@@ -68,9 +69,7 @@ public class GridMapDesigner : MonoBehaviour
         GameObject obj = Instantiate(prefab, pos, Quaternion.identity, grid.transform);
         obj.name = $"{prefab.name}_({gx},{gz})";
         
-        PlacedObject marker = obj.GetComponent<PlacedObject>();
-        if(marker == null)
-            marker = obj.AddComponent<PlacedObject>();
+        PlacedObject marker = obj.GetOrAddComponent<PlacedObject>();
 
         marker.ownerTile = tile;
         tile.SetOccupant(obj);
