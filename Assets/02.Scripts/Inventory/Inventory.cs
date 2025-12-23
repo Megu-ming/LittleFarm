@@ -64,7 +64,7 @@ public class Inventory : MonoBehaviour
 
         if(_database == null)
         {
-            Debug.LogWarning("[Inventory] ItemDatabase�� �����ϴ�");
+            Debug.LogWarning("[Inventory] ItemDatabase가 없습니다");
             return false;
         }
 

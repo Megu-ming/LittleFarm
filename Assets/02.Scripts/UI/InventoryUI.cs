@@ -16,7 +16,7 @@ public class InventoryUI : MonoBehaviour
     bool _isOpen = false;
 
     [Header("드래그 아이콘")]
-    [SerializeField] Vector2 _dragIconSize = new Vector2(64, 64);
+    [SerializeField] Vector2 _dragIconSize = new Vector2(120, 120);
 
     Canvas _rootCanvas;
     RectTransform _dragIconRT;
@@ -24,7 +24,6 @@ public class InventoryUI : MonoBehaviour
 
     int _dragFromIndex = -1;
     bool _isDragging = false;
-    bool _didDrop = false;
 
     public void Initialize(Inventory inventory, ItemDatabase database)
     {
@@ -134,7 +133,6 @@ public class InventoryUI : MonoBehaviour
 
         _dragFromIndex = fromIndex;
         _isDragging = true;
-        _didDrop = false;
 
         CreateDragIconIfNeeded();
         _dragIconImage.sprite = spec.iconSprite;
@@ -157,14 +155,9 @@ public class InventoryUI : MonoBehaviour
         if (_inventory == null) return;
         if(!IsUnlocked(targetIndex)) return;
 
-        if(targetIndex == _dragFromIndex)
-        {
-            _didDrop = true;
-            return;
-        }
+        if (targetIndex == _dragFromIndex) return;
 
         bool changed = _inventory.TryMoveOrMerge(_dragFromIndex, targetIndex);
-        _didDrop = true;
 
         if (changed)
         {
@@ -208,9 +201,9 @@ public class InventoryUI : MonoBehaviour
 
         RectTransform canvasRT = _rootCanvas.transform as RectTransform;
 
-        if(RectTransformUtility.ScreenPointToWorldPointInRectangle(
+        if(RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRT, eventData.position, eventData.pressEventCamera,
-            out Vector3 localPos))
+            out Vector2 localPos))
         {
             _dragIconRT.anchoredPosition = localPos;
         }
@@ -220,7 +213,6 @@ public class InventoryUI : MonoBehaviour
     {
         _isDragging = false;
         _dragFromIndex = -1;
-        _didDrop = false;
 
         if(_dragIconRT != null )
         {
