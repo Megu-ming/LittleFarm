@@ -27,7 +27,7 @@ public class GridSelector : MonoBehaviour
     [SerializeField, ReadOnly]FarmTile _currentTile;
     GameObject _tileHighlightInstance;
     bool isFocus;
-
+    
     public FarmTile CurrentTile => _currentTile;
 
     private void Awake()
@@ -46,12 +46,14 @@ public class GridSelector : MonoBehaviour
     {
         UpdateCurrentTileFromMouseDirection();
 
-        if (_tileHighlightInstance != null && _currentTile != null)
+        if (_tileHighlightInstance != null && _currentTile != null && isFocus)
         {
             _tileHighlightInstance.transform.position =
                 _currentTile.transform.position + Vector3.up * highlightYPos;
             SetHighlightActive(true);
         }
+        else
+            SetHighlightActive(false);
     }
 
     private void UpdateCurrentTileFromMouseDirection()
@@ -84,6 +86,8 @@ public class GridSelector : MonoBehaviour
             Gizmos.DrawRay(ray);
         }
     }
+
+    public void SetFocus(bool isFocus) => this.isFocus = isFocus;
 
     /// <summary>
     /// 마우스 방향의 플레이어 기준 범위 내의 타일 반환
