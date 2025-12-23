@@ -1,8 +1,9 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventorySlotUI : MonoBehaviour
+public class InventorySlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     [Header("ÂüÁ¶")]
     [SerializeField] Image _background;
@@ -15,6 +16,13 @@ public class InventorySlotUI : MonoBehaviour
 
     [SerializeField] int _slotIndex;
     public int SlotIndex => _slotIndex;
+
+    InventoryUI _owner;
+
+    public void SetOwner(InventoryUI owner)
+    {
+        _owner = owner;
+    }
 
     public void SetIndex(int index)
     {
@@ -66,5 +74,29 @@ public class InventorySlotUI : MonoBehaviour
         {
             _countText.text = (stack.Count > 1) ? stack.Count.ToString() : "";
         }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        _owner?.OnSlotBeginDrag(_slotIndex, eventData);
+        Debug.Log($"{_slotIndex}_Slot BeginDrag");
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        _owner?.OnSlotDrag(eventData);
+        Debug.Log($"{_slotIndex}_Slot OnDrag");
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        _owner?.OnSlotEndDrag(eventData);
+        Debug.Log($"{_slotIndex}_Slot EndDrag");
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        _owner?.OnSlotDrop(_slotIndex, eventData);
+        Debug.Log($"{_slotIndex}_Slot Drop");
     }
 }

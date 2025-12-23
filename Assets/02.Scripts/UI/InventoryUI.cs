@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -12,6 +14,17 @@ public class InventoryUI : MonoBehaviour
     ItemDatabase _database;
 
     bool _isOpen = false;
+
+    [Header("드래그 아이콘")]
+    [SerializeField] Vector2 _dragIconSize = new Vector2(64, 64);
+
+    Canvas _rootCanvas;
+    RectTransform _dragIconRT;
+    Image _dragIconImage;
+
+    int _dragFromIndex = -1;
+    bool _isDragging = false;
+    bool _didDrop = false;
 
     public void Initialize(Inventory inventory, ItemDatabase database)
     {
@@ -36,6 +49,7 @@ public class InventoryUI : MonoBehaviour
         {
             InventorySlotUI slot = Instantiate(_slotPrefab, _slotParent);
 
+            slot.SetOwner(this);
             slot.SetIndex(i);
 
             _slotUIs[i] = slot;
@@ -83,6 +97,136 @@ public class InventoryUI : MonoBehaviour
             bool isUnlocked = i < unlocked;
 
             slotUI.Refresh(stack, isUnlocked, _database);
+        }
+    }
+
+    public void RefreshSlot(int index)
+    {
+        if(_inventory == null || _slotUIs == null) return;
+        if(_database == null) return;
+        if(index < 0 || index >= _slotUIs.Length) return;
+
+        int unlocked = _inventory.UnlockedSlots;
+        bool isUnlocked = index < unlocked;
+
+        var slotUI = _slotUIs[index];
+        if (slotUI == null) return;
+
+        var stack = _inventory.GetSlot(index);
+        slotUI.Refresh(stack, isUnlocked, _database);
+    }
+
+    bool IsUnlocked(int index) => _inventory != null && index >= 0 && index < _inventory.UnlockedSlots;
+
+    // 드래그 & 드랍 슬롯 호출 API
+    public void OnSlotBeginDrag(int fromIndex, PointerEventData eventData)
+    {
+        if(!_isOpen) return;
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if(_inventory == null || _database == null) return;
+        if (!IsUnlocked(fromIndex)) return;
+
+        var stack = _inventory.GetSlot(fromIndex);
+        if (stack == null || stack.IsEmpty) return;
+
+        var spec = _database.GetById(stack.ItemId);
+        if (spec == null || spec.iconSprite == null) return;
+
+        _dragFromIndex = fromIndex;
+        _isDragging = true;
+        _didDrop = false;
+
+        CreateDragIconIfNeeded();
+        _dragIconImage.sprite = spec.iconSprite;
+        _dragIconImage.enabled = true;
+
+        UpdateDragIconPosition(eventData);
+    }
+
+    public void OnSlotDrag(PointerEventData eventData)
+    {
+        if (!_isDragging) return;
+        UpdateDragIconPosition(eventData);
+    }
+
+    public void OnSlotDrop(int targetIndex, PointerEventData eventData)
+    {
+        if(!_isDragging) return;
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        if (_inventory == null) return;
+        if(!IsUnlocked(targetIndex)) return;
+
+        if(targetIndex == _dragFromIndex)
+        {
+            _didDrop = true;
+            return;
+        }
+
+        bool changed = _inventory.TryMoveOrMerge(_dragFromIndex, targetIndex);
+        _didDrop = true;
+
+        if (changed)
+        {
+            RefreshSlot(_dragFromIndex);
+            RefreshSlot(targetIndex);
+        }
+    }
+
+    public void OnSlotEndDrag(PointerEventData eventData)
+    {
+        if (!_isDragging) return;
+
+        CancelDrag();
+    }
+
+    // Drag Icon
+
+    // 드래그 이미지가 없으면 생성
+    void CreateDragIconIfNeeded()
+    {
+        if (_dragIconRT != null) return;
+
+        if(_rootCanvas == null) _rootCanvas = GetComponentInParent<Canvas>();
+        if (_rootCanvas == null) return;
+
+        var go = new GameObject("DragIcon", typeof(RectTransform), typeof(Canvas), typeof(Image));
+        go.transform.SetParent(_rootCanvas.transform, false);
+
+        _dragIconRT = go.GetComponent<RectTransform>();
+        _dragIconRT.sizeDelta = _dragIconSize;
+
+        _dragIconImage = go.GetComponent<Image>();
+        _dragIconImage.raycastTarget = false;
+        _dragIconImage.preserveAspect = true;
+        _dragIconImage.enabled = false;
+    }
+
+    void UpdateDragIconPosition(PointerEventData eventData)
+    {
+        if (_dragIconRT == null || _rootCanvas == null) return;
+
+        RectTransform canvasRT = _rootCanvas.transform as RectTransform;
+
+        if(RectTransformUtility.ScreenPointToWorldPointInRectangle(
+            canvasRT, eventData.position, eventData.pressEventCamera,
+            out Vector3 localPos))
+        {
+            _dragIconRT.anchoredPosition = localPos;
+        }
+    }
+
+    void CancelDrag()
+    {
+        _isDragging = false;
+        _dragFromIndex = -1;
+        _didDrop = false;
+
+        if(_dragIconRT != null )
+        {
+            Destroy(_dragIconRT.gameObject);
+            _dragIconRT = null;
+            _dragIconImage = null;
         }
     }
 }

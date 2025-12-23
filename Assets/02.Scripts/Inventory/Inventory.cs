@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
@@ -158,4 +159,64 @@ public class Inventory : MonoBehaviour
     {
         return GetTotalCount(itemId) >= amount;
     }
+
+    // Drag&Drop Method
+    public bool IsUnlockedIndex(int index) => index >= 0 && index < _unlockedSlots;
+
+    public bool TryMoveOrMerge(int fromIndex, int toIndex)
+    {
+        if(_database == null) return false;
+
+        if(fromIndex == toIndex) return false;
+        if (!IsUnlockedIndex(fromIndex) || !IsUnlockedIndex(toIndex)) return false;
+
+        var from = _slots[fromIndex];
+        var to = _slots[toIndex];
+        if (from == null || from.IsEmpty) return false;
+
+        // 1. 빈 곳이면 이동
+        if(to != null && to.IsEmpty)
+        {
+            to.Set(from.ItemId, from.Count);
+            from.Clear();
+
+            SlotChanged?.Invoke(fromIndex);
+            SlotChanged?.Invoke(toIndex);
+            return true;
+        }
+
+        // 2. 같은 아이템이면 합치기
+        if(from.ItemId == to.ItemId)
+        {
+            var spec = _database.GetById(from.ItemId);
+            int maxStack = Mathf.Max(1, spec != null ? spec.maxStack : 1);
+
+            int space = maxStack - to.Count;
+            if (space <= 0) return false;
+
+            int move = Mathf.Min(space, from.Count);
+            to.Add(move);
+
+            from.Remove(move);
+            if (from.Count <= 0) from.Clear();
+
+            SlotChanged?.Invoke(fromIndex);
+            SlotChanged?.Invoke(toIndex);
+            return true;
+        }
+        else
+        {
+            var tmpId = from.ItemId;
+            int tmpCount = from.Count;
+
+            from.Set(to.ItemId, to.Count);
+            to.Set(tmpId, tmpCount);
+
+            SlotChanged?.Invoke(fromIndex);
+            SlotChanged?.Invoke(toIndex);
+            return true;
+        }
+
+    }
+
 }

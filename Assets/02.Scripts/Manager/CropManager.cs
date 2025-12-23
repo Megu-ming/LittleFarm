@@ -139,6 +139,7 @@ public class CropManager : MonoBehaviour
         tile.SetOccupant(obj);
 
         // TODO: 여기서 CropToolTarget(수확) 같은 컴포넌트 연결하면 됨
+        // obj.AddComponent<CropToolTarget>();
     }
 
 }

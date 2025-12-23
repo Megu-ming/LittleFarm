@@ -31,6 +31,7 @@ public class QuickSlotUI : MonoBehaviour
         }
 
         _player.HandChanged += UpdateHand;
+        _inventory.SlotChanged += OnInventorySlotChanged;
         RefreshAll();
 
         UpdateHand(_player.Hand);
@@ -53,6 +54,25 @@ public class QuickSlotUI : MonoBehaviour
 
             slotUI.Refresh(stack, _database);
         }
+    }
+
+    void RefreshSlot(int index)
+    {
+        if (_inventory == null || _database == null) return;
+        if (_quickSlots == null || index < 0 || index >= _quickSlots.Count) return;
+
+        var slotUI = _quickSlots[index];
+        if (slotUI == null) return;
+
+        var stack = _inventory.GetSlot(index);
+        slotUI.Refresh(stack, _database);
+    }
+
+    void OnInventorySlotChanged(int index)
+    {
+        // Äü½½·Ô ¿µ¿ª(0~9)¸¸ ¹Ý¿µ
+        if (index < 0 || index >= slotCount) return;
+        RefreshSlot(index);
     }
 
     public void UpdateHand(int index)
