@@ -62,4 +62,55 @@ public class GameInitializer : MonoBehaviour
 
         _cropManager.Initialize(_timeManager, _gridManager);
     }
+
+    // 필드에 아이템 드랍해주는 함수
+    public void DropItems(string itemKey, Vector3 dropOffset, int dropMin = 1, int dropMax = 1)
+    {
+        var db = _database;
+        if (db == null)
+        {
+            Debug.LogWarning("[GameInitializer::DropItems] ItemDatabase가 없습니다.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(itemKey))
+        {
+            Debug.LogWarning("[GameInitializer::DropItems] 드랍 아이템 Key가 없습니다.");
+            return;
+        }
+
+        ItemSpec spec = db.GetByKey(itemKey);
+        if (spec == null)
+        {
+            Debug.LogWarning($"[GameInitializer::DropItems] 드랍 아이템을 찾을 수 없습니다. key = {itemKey}");
+            return;
+        }
+
+        int itemId = spec.id;
+
+        int dropCount = Random.Range(dropMin, dropMax + 1);
+        if (dropCount <= 0) return;
+
+        GameObject prefab = Resources.Load<GameObject>($"ItemDrops/{spec.worldKey}");
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[GameInitializer::DropItems] 프리팹을 찾을 수 없습니다: Resources/ItemDrops/{spec.worldKey}");
+            return;
+        }
+
+        for (int i = 0; i < dropCount; i++)
+        {
+            Vector2 rand = Random.insideUnitCircle * 0.3f;
+            Vector3 pos = transform.position + dropOffset + new Vector3(rand.x, 0, rand.y);
+
+            GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+
+            var pickup = go.GetComponent<ItemPickup>();
+            if (pickup != null)
+            {
+                pickup.Setup(itemId, 1);
+                pickup.PlayDropEffect();
+            }
+        }
+    }
 }
