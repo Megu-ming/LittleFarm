@@ -8,7 +8,7 @@ using UnityEngine;
 public class CropManager : MonoBehaviour
 {
     [Serializable]
-    public class SeedVisual
+    public class CropVisual
     {
         public int _seedItemId;
         public GameObject[] _stagePrefabs;
@@ -18,12 +18,12 @@ public class CropManager : MonoBehaviour
     }
 
     [Header("심기 프리팹")]
-    [SerializeField] List<SeedVisual> _seedVisuals = new List<SeedVisual>();
+    [SerializeField] List<CropVisual> _cropVisuals = new List<CropVisual>();
     [SerializeField] GameObject _defaultPlantedPrefab;
 
     GameTimeManager _timeManager;
     private readonly HashSet<FarmTile> _plantedTiles = new HashSet<FarmTile>();
-    Dictionary<int, SeedVisual> _seedVisualById;
+    Dictionary<int, CropVisual> _cropVisualById;
 
     public void Initialize(GameTimeManager timeManager, GridManager gridManager)
     {
@@ -31,12 +31,12 @@ public class CropManager : MonoBehaviour
 
         _timeManager.OnDateChanged += HandleNewDay;
 
-        _seedVisualById = new Dictionary<int, SeedVisual>();
-        foreach(var v in _seedVisuals)
+        _cropVisualById = new Dictionary<int, CropVisual>();
+        foreach(var v in _cropVisuals)
         {
             if (v == null) continue;
-            if (!_seedVisualById.ContainsKey(v._seedItemId))
-                _seedVisualById[v._seedItemId] = v;
+            if (!_cropVisualById.ContainsKey(v._seedItemId))
+                _cropVisualById[v._seedItemId] = v;
         }
     }
 
@@ -87,7 +87,7 @@ public class CropManager : MonoBehaviour
         GameObject prefab = _defaultPlantedPrefab;
         Vector3 offset = Vector3.zero;
 
-        if (_seedVisualById != null && _seedVisualById.TryGetValue(seedItemId, out var v))
+        if (_cropVisualById != null && _cropVisualById.TryGetValue(seedItemId, out var v))
         {
             offset = v._offset;
 
@@ -116,7 +116,7 @@ public class CropManager : MonoBehaviour
         GameObject prefab = null;
         Vector3 offset = Vector3.zero;
 
-        if (_seedVisualById != null && _seedVisualById.TryGetValue(seedItemId, out var v))
+        if (_cropVisualById != null && _cropVisualById.TryGetValue(seedItemId, out var v))
         {
             offset = v._offset;
             prefab = v._grownPrefab;
@@ -130,7 +130,7 @@ public class CropManager : MonoBehaviour
 
         if (prefab == null)
         {
-            // 완성 프리팹이 없으면 그냥 비주얼 제거(원하면 경고)
+            Debug.Log("[CropManager] No GrownPrefab Exsist");
             tile.ClearOccupant();
             return;
         }
@@ -138,8 +138,10 @@ public class CropManager : MonoBehaviour
         var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
         tile.SetOccupant(obj);
 
-        // TODO: 여기서 CropToolTarget(수확) 같은 컴포넌트 연결하면 됨
-        // obj.AddComponent<CropToolTarget>();
+        var ch = obj.AddComponent<CropHarvestable>();
+        // TODO: 여기서 CropHarvestable 연결해주고 작물 아이디 넘겨주면서 외형 + 어떤 작물인지 결정
+        var spec = GameInitializer.Instance.Database.GetById(seedItemId + 1);
+        ch.Initialize(spec.key);
     }
 
 }

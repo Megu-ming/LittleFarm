@@ -49,52 +49,8 @@ public class StoneToolTarget : MonoBehaviour, IToolTarget, IInteractable
     /// </summary>
     private void DropItems()
     {
-        var db = GameInitializer.Instance.Database;
-        if(db == null )
-        {
-            Debug.LogWarning("[StoneToolTarget] ItemDatabase가 없습니다.");
-            return;
-        }
-
-        if(string.IsNullOrEmpty(_dropItemKey ) )
-        {
-            Debug.LogWarning("[StoneToolTarget] 드랍 아이템 Key가 없습니다.");
-            return;
-        }
-
-        ItemSpec spec = db.GetByKey(_dropItemKey);
-        if(spec == null)
-        {
-            Debug.LogWarning($"[StoneToolTarget] 드랍 아이템을 찾을 수 없습니다. key = {_dropItemKey}");
-            return;
-        }
-
-        int itemId = spec.id;
-
-        int dropCount = Random.Range(_dropCountMin, _dropCountMax + 1);
-        if (dropCount <= 0) return;
-
-        GameObject prefab = Resources.Load<GameObject>($"ItemDrops/{spec.worldKey}");
-        if(prefab == null)
-        {
-            Debug.LogWarning($"[StoneToolTarget] 프리팹을 찾을 수 없습니다: Resources/ItemDrops/{spec.worldKey}");
-            return;
-        }
-
-        for(int i = 0; i < dropCount; i++)
-        {
-            Vector2 rand = Random.insideUnitCircle * 0.3f;
-            Vector3 pos = transform.position + _dropOffset + new Vector3(rand.x, 0, rand.y);
-
-            GameObject go = Instantiate(prefab, pos, Quaternion.identity);
-            
-            var pickup = go.GetComponent<ItemPickup>();
-            if(pickup != null)
-            {
-                pickup.Setup(itemId, 1);
-                pickup.PlayDropEffect();
-            }
-        }
+        GameInitializer.Instance.DropItems
+            (_dropItemKey, _dropOffset, _dropCountMin, _dropCountMax);
 
         Destroy(gameObject);
     }
