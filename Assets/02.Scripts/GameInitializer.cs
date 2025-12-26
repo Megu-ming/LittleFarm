@@ -64,7 +64,7 @@ public class GameInitializer : MonoBehaviour
     }
 
     // 필드에 아이템 드랍해주는 함수
-    public void DropItems(string itemKey, Vector3 dropOffset, int dropMin = 1, int dropMax = 1)
+    public void DropItems(string itemKey, Vector3 spawnPosition, Vector3 dropOffset, int dropMin = 1, int dropMax = 1)
     {
         var db = _database;
         if (db == null)
@@ -101,7 +101,7 @@ public class GameInitializer : MonoBehaviour
         for (int i = 0; i < dropCount; i++)
         {
             Vector2 rand = Random.insideUnitCircle * 0.3f;
-            Vector3 pos = transform.position + dropOffset + new Vector3(rand.x, 0, rand.y);
+            Vector3 pos = spawnPosition + dropOffset + new Vector3(rand.x, 0, rand.y);
 
             GameObject go = Instantiate(prefab, pos, Quaternion.identity);
 

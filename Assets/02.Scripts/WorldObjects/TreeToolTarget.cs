@@ -50,7 +50,7 @@ public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
     private void DropItems()
     {
         GameInitializer.Instance.DropItems
-            (_dropItemKey, _dropOffset, _dropCountMin, _dropCountMax);
+            (_dropItemKey, transform.position, _dropOffset, _dropCountMin, _dropCountMax);
 
         Destroy(gameObject);
     }

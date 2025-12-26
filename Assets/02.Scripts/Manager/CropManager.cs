@@ -126,8 +126,11 @@ public class CropManager : MonoBehaviour
         }
 
         if (tile.occupant != null)
+        {
             Destroy(tile.occupant);
-
+            tile.ClearOccupant();
+        }
+        
         if (prefab == null)
         {
             Debug.Log("[CropManager] No GrownPrefab Exsist");
@@ -141,7 +144,7 @@ public class CropManager : MonoBehaviour
         var ch = obj.AddComponent<CropHarvestable>();
         // TODO: 여기서 CropHarvestable 연결해주고 작물 아이디 넘겨주면서 외형 + 어떤 작물인지 결정
         var spec = GameInitializer.Instance.Database.GetById(seedItemId + 1);
-        ch.Initialize(spec.key);
+        ch.Initialize(tile, spec.key);
     }
 
 }
