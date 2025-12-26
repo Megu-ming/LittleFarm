@@ -301,11 +301,7 @@ public class Player : MonoBehaviour
         // 씨앗은 “경작된 타일”에서만
         if (!targetTile.CanPlantSeed) return false;
 
-        if (_cropManager == null)
-        {
-            // CropManager 없으면 논리만 심기(비주얼 없음)
-            return targetTile.TryPlantSeed(seedItemId, 3);
-        }
+        if (_cropManager == null) return false;
 
         return _cropManager.PlantSeed(targetTile, seedItemId, 3);
     }

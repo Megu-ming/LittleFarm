@@ -46,21 +46,13 @@ public class FarmTile : MonoBehaviour, IInteractable, IToolTarget
     public bool used = false;
     public GameObject occupant;
 
-    [Header("작물 상태")]
-    [SerializeField] bool _hasCrop = false;     // 이 타일에 작물이 있는가
-    [SerializeField] int _cropItemId = -1;      // 어떤 씨앗/작물인지 (ItemId)
-    [SerializeField] int _growthStage = 0;      // 성장 단계 (0 = 심은 직후)
-    [SerializeField] int _maxGrowthStage = 3;   // 최종 단계 (나중에 데이터화 예정)
     [SerializeField] bool _wateredToday = false;// 오늘 물 줬는지
 
     public bool IsTilled => _isTilled;
-    public bool HasCrop => _hasCrop;
     public bool CanBeTilled => _tileType == TileType.Ground || _tileType == TileType.Tilled;
-    public bool CanPlantSeed => _isTilled && !_hasCrop;
+    public bool CanPlantSeed => _isTilled && occupant == null;
+    public bool WasWateredToday => _wateredToday;
     public bool IsWalkable => _tileType != TileType.Block && _tileType != TileType.Water;
-    public int CropItemId => _cropItemId;
-    public int GrowthStage => _growthStage;
-    public int MaxGrowthStage => _maxGrowthStage;
 
     // 점유자 설정
     public void SetOccupant(GameObject obj)
@@ -195,59 +187,16 @@ public class FarmTile : MonoBehaviour, IInteractable, IToolTarget
         }
     }
 
-    public bool TryPlantSeed(int itemId, int maxGrowthStage)
-    {
-        if (!CanPlantSeed) return false;
-
-        _hasCrop = true;
-        _cropItemId = itemId;
-        _growthStage = 0;
-        _maxGrowthStage = maxGrowthStage;
-
-        // TODO: 여기서 "씨앗 프리팹"을 스폰하거나, 타일 비주얼을 '씨앗 심은 모양'으로 변경
-        Debug.Log($"[FarmTile] {name} 씨앗 심기 완료 (itemId={itemId})");
-
-        return true;
-    }
-
-    public bool TryAdvancedGrowthOneDay()
-    {
-        if (!_hasCrop) return false;
-        if (!_wateredToday) return false;
-        // 성장이 끝나면 오브젝트 Crop으로 교체
-        if (_growthStage >= _maxGrowthStage)
-        {
-            _wateredToday = false;
-            if (TileType == TileType.Watered) TileType = TileType.Tilled;
-            return false;
-        }
-
-        _growthStage++;
-        _wateredToday = false;
-
-        if (TileType == TileType.Watered) TileType = TileType.Tilled;
-        Debug.Log($"[FarmTile] {name} 성장 단계 : {_growthStage}/{_maxGrowthStage}");
-
-        // TODO:
-        // 작물 성장 이벤트 호출 (성장 단계에 맞는 외형으로 오브젝트 변경)
-        return true;
-    }
-
-    public void ClearCropState(bool keepTilled = true)
-    {
-        _hasCrop = false;
-        _cropItemId = -1;
-        _growthStage = 0;
-        _maxGrowthStage = 0;
-        _wateredToday = false;
-
-        if (keepTilled && TileType == TileType.Watered)
-            TileType = TileType.Tilled;
-    }
-
     public void Interact(PlayerInteraction interactor)
     {
         //if(CanPlantSeed && !_hasCrop)
         //    TryPlantSeed(3001, 3);
+    }
+
+    public void ClearWateredTodayAndResetVisual()
+    {
+        _wateredToday = false;
+        if (TileType == TileType.Watered)
+            TileType = TileType.Tilled;
     }
 }   

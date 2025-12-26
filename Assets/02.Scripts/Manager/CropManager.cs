@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ³óÀÛ¹° & ÀÚ¶ö ¼ö ÀÖ´Â ³ª¹«µéÀ» °ü¸®ÇÏ´Â ÀÛ¹° ¸Å´ÏÀú
+/// ë†ì‘ë¬¼ & ìë„ ìˆ˜ ìˆëŠ” ë‚˜ë¬´ë“¤ì„ ê´€ë¦¬í•˜ëŠ” ì‘ë¬¼ ë§¤ë‹ˆì €
 /// </summary>
 public class CropManager : MonoBehaviour
 {
@@ -17,7 +17,16 @@ public class CropManager : MonoBehaviour
         public Vector3 _offset = new Vector3(0, 0.05f, 0);
     }
 
-    [Header("½É±â ÇÁ¸®ÆÕ")]
+    class CropState
+    {
+        public int _seedItemId;
+        public int _stage;
+        public int _maxStage;
+    }
+
+    private readonly Dictionary<FarmTile, CropState> _crops = new();
+
+    [Header("ì‹¬ê¸° í”„ë¦¬íŒ¹")]
     [SerializeField] List<CropVisual> _cropVisuals = new List<CropVisual>();
     [SerializeField] GameObject _defaultPlantedPrefab;
 
@@ -42,28 +51,43 @@ public class CropManager : MonoBehaviour
 
     void HandleNewDay(int year, Season season, int day)
     {
-        if (_plantedTiles.Count == 0) return;
+        if (_crops.Count == 0) return;
 
-        var snapshot = new List<FarmTile>(_plantedTiles);
+        var snapshot = new List<KeyValuePair<FarmTile, CropState>>(_crops);
 
-        foreach (var tile in snapshot)
+        foreach (var pair in snapshot)
         {
-            if (tile == null) { _plantedTiles.Remove(tile); continue; }
-            if (!tile.HasCrop) { _plantedTiles.Remove(tile); continue; }
+            var tile = pair.Key;
+            var state = pair.Value;
 
-            bool grew = tile.TryAdvancedGrowthOneDay();
-            if (!grew) continue; // ¹° ¾È ÁáÀ¸¸é ¿ÜÇüµµ ±×´ë·Î
-
-            // ¼ºÀå ´Ü°è¿¡ µû¸¥ ¿ÜÇü ±³Ã¼
-            if (tile.GrowthStage >= tile.MaxGrowthStage)
+            if (tile == null)
             {
-                ConvertToGrownCrop(tile);
-                // Áö±İÀº ¿Ï¼º ÈÄ ¼ºÀå ´õ ¾È ÇÏ´Ï±î ¸ñ·Ï¿¡¼­ Á¦°Å(Àç¼ºÀå ÀÛ¹° ³ÖÀ» ¶§´Â À¯Áö)
-                _plantedTiles.Remove(tile);
+                _crops.Remove(tile);
+                continue;
+            }
+
+            // ìˆ˜í™•/íŒŒê´´ ë“±ìœ¼ë¡œ ì ìœ ë¬¼ì´ ì—†ì–´ì¡Œìœ¼ë©´ ì‘ë¬¼ë„ ì œê±°
+            if (tile.occupant == null)
+            {
+                _crops.Remove(tile);
+                continue;
+            }
+
+            // ì˜¤ëŠ˜ ë¬¼ ì•ˆ ì¤¬ìœ¼ë©´ ì„±ì¥ X
+            if (!tile.WasWateredToday)
+                continue;
+
+            state._stage++;
+            tile.ClearWateredTodayAndResetVisual();
+
+            if (state._stage >= state._maxStage)
+            {
+                ConvertToGrownCrop(tile, state._seedItemId);
+                _crops.Remove(tile);
             }
             else
             {
-                SpawnVisualForStage(tile, tile.GrowthStage, tile.CropItemId);
+                SpawnVisualForStage(tile, state._stage, state._seedItemId);
             }
         }
     }
@@ -71,9 +95,16 @@ public class CropManager : MonoBehaviour
     public bool PlantSeed(FarmTile tile, int seedItemId, int maxGrouthDays = 3)
     {
         if(tile == null) return false;
-        if (!tile.TryPlantSeed(seedItemId, maxGrouthDays)) return false;
+        if (!tile.CanPlantSeed) return false;
 
-        _plantedTiles.Add(tile); // ¡Ú ½É¾îÁø Å¸ÀÏ¸¸ °ü¸®
+        if (_crops.ContainsKey(tile)) return false;
+
+        _crops[tile] = new CropState
+        {
+            _seedItemId = seedItemId,
+            _stage = 0,
+            _maxStage = maxGrouthDays
+        };
 
         SpawnVisualForStage(tile, stage: 0, seedItemId);
         return true;
@@ -91,10 +122,10 @@ public class CropManager : MonoBehaviour
         {
             offset = v._offset;
 
-            // 1) stage ÇÁ¸®ÆÕ ¿ì¼±
+            // 1) stage í”„ë¦¬íŒ¹ ìš°ì„ 
             if (v._stagePrefabs != null && stage >= 0 && stage < v._stagePrefabs.Length && v._stagePrefabs[stage] != null)
                 prefab = v._stagePrefabs[stage];
-            // 2) ¾øÀ¸¸é ±âÁ¸ plantedPrefab
+            // 2) ì—†ìœ¼ë©´ ê¸°ì¡´ plantedPrefab
             else if (v._plantedPrefab != null)
                 prefab = v._plantedPrefab;
         }
@@ -109,10 +140,8 @@ public class CropManager : MonoBehaviour
         tile.SetOccupant(obj);
     }
 
-    private void ConvertToGrownCrop(FarmTile tile)
+    private void ConvertToGrownCrop(FarmTile tile, int seedItemId)
     {
-        int seedItemId = tile.CropItemId;
-
         GameObject prefab = null;
         Vector3 offset = Vector3.zero;
 
@@ -120,7 +149,7 @@ public class CropManager : MonoBehaviour
         {
             offset = v._offset;
             prefab = v._grownPrefab;
-            // grownPrefabÀÌ ¾øÀ¸¸é ¸¶Áö¸· stage ÇÁ¸®ÆÕÀ» ´ëÃ¼·Î »ç¿ë °¡´É
+            // grownPrefabì´ ì—†ìœ¼ë©´ ë§ˆì§€ë§‰ stage í”„ë¦¬íŒ¹ì„ ëŒ€ì²´ë¡œ ì‚¬ìš© ê°€ëŠ¥
             if (prefab == null && v._stagePrefabs != null && v._stagePrefabs.Length > 0)
                 prefab = v._stagePrefabs[^1];
         }
@@ -142,7 +171,7 @@ public class CropManager : MonoBehaviour
         tile.SetOccupant(obj);
 
         var ch = obj.AddComponent<CropHarvestable>();
-        // TODO: ¿©±â¼­ CropHarvestable ¿¬°áÇØÁÖ°í ÀÛ¹° ¾ÆÀÌµğ ³Ñ°ÜÁÖ¸é¼­ ¿ÜÇü + ¾î¶² ÀÛ¹°ÀÎÁö °áÁ¤
+        // TODO: ì—¬ê¸°ì„œ CropHarvestable ì—°ê²°í•´ì£¼ê³  ì‘ë¬¼ ì•„ì´ë”” ë„˜ê²¨ì£¼ë©´ì„œ ì™¸í˜• + ì–´ë–¤ ì‘ë¬¼ì¸ì§€ ê²°ì •
         var spec = GameInitializer.Instance.Database.GetById(seedItemId + 1);
         ch.Initialize(tile, spec.key);
     }
