@@ -52,7 +52,11 @@ public class Player : MonoBehaviour
     public ToolData CurrentToolData => _currentToolData;
     public int Hand => _hand;
 
+    // Hand 변경 이벤트 구독 함수
     public Action<int> HandChanged;
+    // Hand 변경 애니메이션
+    static readonly int IsHoldingHash = Animator.StringToHash("IsHolding");
+
 
     public void SetState(PlayerState state)
     {
@@ -73,6 +77,7 @@ public class Player : MonoBehaviour
 
         HandChanged?.Invoke(_hand);
         RefreshHandItemProp();
+        UpdateHoldingAnimFlag();
     }
 
     public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, QuickSlotUI quickSlotUI)
@@ -90,6 +95,7 @@ public class Player : MonoBehaviour
             _inventory.SlotChanged += OnInventorySlotChanged;
 
         RefreshHandItemProp();
+        UpdateHoldingAnimFlag();
     }
 
     private void Update()
@@ -237,6 +243,7 @@ public class Player : MonoBehaviour
 
         _hand = -1;                 
         HandChanged?.Invoke(_hand);
+        UpdateHoldingAnimFlag();
     }
 
     public bool TryPickupItem(int itemId, int amount)
@@ -310,7 +317,10 @@ public class Player : MonoBehaviour
     {
         // 현재 손이 가리키는 슬롯이 바뀌면 손 프롭도 갱신
         if (_hand == slotIndex)
+        {
             RefreshHandItemProp();
+            UpdateHoldingAnimFlag();
+        }
     }
 
     void RefreshHandItemProp()
@@ -353,7 +363,8 @@ public class Player : MonoBehaviour
 
         ClearHandItemProp();
 
-        _currentHandItemInstance = Instantiate(spec.handPrefab, _rightHandItemPropTransform);
+        _currentHandItemInstance = Instantiate(spec.handPrefab);
+        _currentHandItemInstance.transform.SetParent(_rightHandItemPropTransform, false);
 
         _currentHandItemId = slot.ItemId;
     }
@@ -374,5 +385,21 @@ public class Player : MonoBehaviour
 
         _currentToolInstance = null;
         _currentToolData = null;
+    }
+
+    void UpdateHoldingAnimFlag()
+    {
+        if (_animator == null)
+            return;
+
+        bool isHolding = false;
+
+        if (_hand >= 0 && _hand < 10 && _inventory != null)
+        {
+            var slot = _inventory.GetSlot(_hand);
+            isHolding = (slot != null && !slot.IsEmpty);
+        }
+
+        _animator.SetBool(IsHoldingHash, isHolding);
     }
 }

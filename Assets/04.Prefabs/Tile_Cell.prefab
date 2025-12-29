@@ -127,8 +127,4 @@ MonoBehaviour:
   _isTilled: 0
   used: 0
   occupant: {fileID: 0}
-  _hasCrop: 0
-  _cropItemId: -1
-  _growthStage: 0
-  _maxGrowthStage: 3
   _wateredToday: 0
