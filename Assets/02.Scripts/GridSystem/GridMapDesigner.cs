@@ -66,13 +66,8 @@ public class GridMapDesigner : MonoBehaviour
         pos.y += yOffset;
 
         // 에디터/플레이 둘 다에서 동작하도록 일반 Instantiate 사용
-        GameObject obj = Instantiate(prefab, pos, Quaternion.identity, grid.transform);
+        GameObject obj = PlacementService.PlaceOnTile(prefab, tile, pos, Quaternion.identity);
         obj.name = $"{prefab.name}_({gx},{gz})";
-        
-        PlacedObject marker = obj.GetOrAddComponent<PlacedObject>();
-
-        marker.SetOwner(tile);
-        tile.SetOccupant(obj);
     }
 
     public void EraseAt(int gx, int gz)

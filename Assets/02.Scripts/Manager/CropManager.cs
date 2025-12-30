@@ -137,9 +137,9 @@ public class CropManager : MonoBehaviour
             return;
         }
 
-        var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
-        obj.SetOwner(tile);
-        tile.SetOccupant(obj.gameObject);
+        //var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
+        //obj.SetOwner(tile);
+        PlacementService.PlaceOnTile(prefab, tile, offset, Quaternion.identity, replaceExisting: true);
     }
 
     private void ConvertToGrownCrop(FarmTile tile, int seedItemId)
@@ -169,8 +169,7 @@ public class CropManager : MonoBehaviour
             return;
         }
 
-        var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
-        tile.SetOccupant(obj.gameObject);
+        var obj = PlacementService.PlaceOnTile(prefab, tile, offset, Quaternion.identity, replaceExisting: true);
 
         var ch = obj.GetOrAddComponent<CropHarvestable>();
         // TODO: 여기서 CropHarvestable 연결해주고 작물 아이디 넘겨주면서 외형 + 어떤 작물인지 결정

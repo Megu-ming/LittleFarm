@@ -12,6 +12,7 @@ public class PlacedObject : MonoBehaviour
     public void SetOwner(FarmTile ownerTile)
     {
         _ownerTile = ownerTile;
+        RegisterOccupancy();
     }
 
     public void SetOccupiedTiles(FarmTile origin, FarmTile[] tiles)

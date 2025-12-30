@@ -19,6 +19,8 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] QuickSlotUI _quickSlotUI;
     [SerializeField] TimeUI _timeUI;
 
+    [SerializeField] Transform _worldRoot;
+
     public ItemDatabase Database => _database;
 
     public static GameInitializer Instance
@@ -47,6 +49,8 @@ public class GameInitializer : MonoBehaviour
     private void Start()
     {
         instance = this;
+
+        PlacementService.Initialize(_worldRoot);
 
         _tgManager.Initialize();
 
