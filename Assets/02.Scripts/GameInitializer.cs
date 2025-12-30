@@ -63,7 +63,7 @@ public class GameInitializer : MonoBehaviour
         _cropManager.Initialize(_timeManager, _gridManager);
     }
 
-    // 필드에 아이템 드랍해주는 함수
+    // 필드에 아이템 드랍해주는 함수 -> 헬퍼 클래스 만들어서 옮길 예정
     public void DropItems(string itemKey, Vector3 spawnPosition, Vector3 dropOffset, int dropMin = 1, int dropMax = 1)
     {
         var db = _database;

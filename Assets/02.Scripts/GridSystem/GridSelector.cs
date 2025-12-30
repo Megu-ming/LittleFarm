@@ -202,10 +202,10 @@ public class GridSelector : MonoBehaviour
         // fallback용 월드 기준 위치 (ownerTile 없을 때)
         Vector3 refPos = ((MonoBehaviour)target).transform.position;
 
-        if (placed != null && placed.ownerTile != null)
+        if (placed != null && placed.OwnerTile != null)
         {
             // 타일 기준 위치
-            refPos = placed.ownerTile.transform.position;
+            refPos = placed.OwnerTile.transform.position;
 
             if (grid != null &&
                 grid.WorldToGrid(playerPos, out int px, out int pz) &&

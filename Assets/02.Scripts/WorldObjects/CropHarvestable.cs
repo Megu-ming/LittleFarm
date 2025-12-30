@@ -1,14 +1,13 @@
 using UnityEngine;
 
-public class CropHarvestable : MonoBehaviour, IToolTarget, IInteractable
+public class CropHarvestable : PlacedObject, IToolTarget, IInteractable
 {
     string _cropItemKey;
     Vector3 _dropOffset = new Vector3(0f, 0.5f, 0f);
-    FarmTile _ownerTile;
 
     public void Initialize(FarmTile ownerTile, string cropItemKey)
     {
-        _ownerTile = ownerTile;
+        SetOwner(ownerTile);
         _cropItemKey = cropItemKey;
     }
 
@@ -17,7 +16,6 @@ public class CropHarvestable : MonoBehaviour, IToolTarget, IInteractable
         GameInitializer.Instance.DropItems(_cropItemKey, transform.position, _dropOffset);
 
         Destroy(gameObject);
-        _ownerTile.ClearOccupant();
     }
 
     public void OnToolAction(ToolActionContext context)

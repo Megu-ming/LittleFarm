@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8262089916698623245}
   - component: {fileID: 5413350839991332857}
   - component: {fileID: 8449767237131179256}
+  - component: {fileID: 2514406015297860658}
   m_Layer: 12
   m_Name: TestCropGrown
   m_TagString: Untagged
@@ -108,3 +109,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2514406015297860658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7296181474555125156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe12e324c5a9404a990899a2cef25f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ownerTile: {fileID: 0}

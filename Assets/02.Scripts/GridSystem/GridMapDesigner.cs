@@ -71,7 +71,7 @@ public class GridMapDesigner : MonoBehaviour
         
         PlacedObject marker = obj.GetOrAddComponent<PlacedObject>();
 
-        marker.ownerTile = tile;
+        marker.SetOwner(tile);
         tile.SetOccupant(obj);
     }
 

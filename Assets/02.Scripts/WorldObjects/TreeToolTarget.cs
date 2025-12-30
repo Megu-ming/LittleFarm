@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TreeToolTarget : MonoBehaviour, IToolTarget, IInteractable
+public class TreeToolTarget : PlacedObject, IToolTarget, IInteractable
 {
     [Header("설정 데이터")]
     [SerializeField] float _maxHealth = 3f;

@@ -199,4 +199,10 @@ public class FarmTile : MonoBehaviour, IInteractable, IToolTarget
         if (TileType == TileType.Watered)
             TileType = TileType.Tilled;
     }
+
+    public void ClearOccupantIf(GameObject expectedOccupant)
+    {
+        if (occupant == expectedOccupant)
+            ClearOccupant();
+    }
 }   

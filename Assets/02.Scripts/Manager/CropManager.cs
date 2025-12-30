@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -11,9 +12,9 @@ public class CropManager : MonoBehaviour
     public class CropVisual
     {
         public int _seedItemId;
-        public GameObject[] _stagePrefabs;
-        public GameObject _grownPrefab;
-        public GameObject _plantedPrefab;
+        public SeedToolTarget[] _stagePrefabs;
+        public CropHarvestable _grownPrefab;
+        public SeedToolTarget _plantedPrefab;
         public Vector3 _offset = new Vector3(0, 0.05f, 0);
     }
 
@@ -28,7 +29,7 @@ public class CropManager : MonoBehaviour
 
     [Header("심기 프리팹")]
     [SerializeField] List<CropVisual> _cropVisuals = new List<CropVisual>();
-    [SerializeField] GameObject _defaultPlantedPrefab;
+    [SerializeField] SeedToolTarget _defaultPlantedPrefab;
 
     GameTimeManager _timeManager;
     private readonly HashSet<FarmTile> _plantedTiles = new HashSet<FarmTile>();
@@ -115,7 +116,7 @@ public class CropManager : MonoBehaviour
         if (tile.occupant != null)
             Destroy(tile.occupant);
 
-        GameObject prefab = _defaultPlantedPrefab;
+        SeedToolTarget prefab = _defaultPlantedPrefab;
         Vector3 offset = Vector3.zero;
 
         if (_cropVisualById != null && _cropVisualById.TryGetValue(seedItemId, out var v))
@@ -137,12 +138,13 @@ public class CropManager : MonoBehaviour
         }
 
         var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
-        tile.SetOccupant(obj);
+        obj.SetOwner(tile);
+        tile.SetOccupant(obj.gameObject);
     }
 
     private void ConvertToGrownCrop(FarmTile tile, int seedItemId)
     {
-        GameObject prefab = null;
+        PlacedObject prefab = null;
         Vector3 offset = Vector3.zero;
 
         if (_cropVisualById != null && _cropVisualById.TryGetValue(seedItemId, out var v))
@@ -168,9 +170,9 @@ public class CropManager : MonoBehaviour
         }
 
         var obj = Instantiate(prefab, tile.transform.position + offset, Quaternion.identity);
-        tile.SetOccupant(obj);
+        tile.SetOccupant(obj.gameObject);
 
-        var ch = obj.AddComponent<CropHarvestable>();
+        var ch = obj.GetOrAddComponent<CropHarvestable>();
         // TODO: 여기서 CropHarvestable 연결해주고 작물 아이디 넘겨주면서 외형 + 어떤 작물인지 결정
         var spec = GameInitializer.Instance.Database.GetById(seedItemId + 1);
         ch.Initialize(tile, spec.key);
