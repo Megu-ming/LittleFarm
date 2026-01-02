@@ -30,7 +30,7 @@ public class GridSelector : MonoBehaviour
     
     public FarmTile CurrentTile => _currentTile;
 
-    private void Awake()
+    public void Initialize()
     {
         if (cam == null)
             cam = Camera.main;

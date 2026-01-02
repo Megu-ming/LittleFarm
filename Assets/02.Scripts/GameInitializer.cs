@@ -4,6 +4,9 @@ public class GameInitializer : MonoBehaviour
 {
     private static GameInitializer instance;
 
+    [Header("테스트용 임시")]
+    [SerializeField] BuildingPlacer _buildingPlacer;
+
     [Header("주요 객체 참조")]
     [SerializeField] Player _player;
     [SerializeField] ItemDatabase _database;
@@ -11,6 +14,7 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] GameTimeManager _timeManager;
     [SerializeField] CropManager _cropManager;
     [SerializeField] GridManager _gridManager;
+    [SerializeField] GridSelector _gridSelector;
     [SerializeField] TerrainGridManager _tgManager;
 
     [Header("UI 참조")]
@@ -53,6 +57,7 @@ public class GameInitializer : MonoBehaviour
         PlacementService.Initialize(_worldRoot);
 
         _tgManager.Initialize();
+        _gridSelector.Initialize();
 
         _database.Initialize();
         _inventory.Initialize(_database);
@@ -65,6 +70,9 @@ public class GameInitializer : MonoBehaviour
         _timeUI.Initialize(_timeManager);
 
         _cropManager.Initialize(_timeManager, _gridManager);
+
+        // 테스트용 임시
+        _buildingPlacer.Initialize(_gridSelector, _gridManager);
     }
 
     // 필드에 아이템 드랍해주는 함수 -> 헬퍼 클래스 만들어서 옮길 예정

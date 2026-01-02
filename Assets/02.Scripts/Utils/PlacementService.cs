@@ -99,6 +99,42 @@ public static class PlacementService
         return inst;
     }
 
+    public static GameObject PlaceFootprint(
+    GameObject prefab,
+    FarmTile originTile,
+    FarmTile[] tiles,
+    Vector3 offset,
+    Quaternion rotation,
+    bool replaceExisting = true
+)
+    {
+        EnsureInitialized();
+        if (prefab == null || originTile == null || tiles == null || tiles.Length == 0) return null;
+
+        if (replaceExisting)
+        {
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                var t = tiles[i];
+                if (t == null) continue;
+
+                if (t.occupant != null)
+                {
+                    Object.Destroy(t.occupant);
+                    t.ClearOccupant();
+                }
+            }
+        }
+
+        Vector3 pos = originTile.transform.position + offset;
+        var inst = Object.Instantiate(prefab, pos, rotation, _worldRoot);
+
+        var placed = EnsurePlacedObject(inst);
+        placed.SetOccupiedTiles(originTile, tiles);
+
+        return inst;
+    }
+
     static PlacedObject EnsurePlacedObject(GameObject go)
     {
         var placed = go.GetComponent<PlacedObject>();
