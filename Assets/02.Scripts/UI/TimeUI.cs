@@ -22,7 +22,6 @@ public class TimeUI : MonoBehaviour
     {
         if (_timeText == null) return;
 
-        // 24½Ã°£Á¦ Ç¥±â 06:00 Çü½Ä
         _timeText.text = $"{hour:00}:{minute:00}";
     }
 
@@ -31,19 +30,19 @@ public class TimeUI : MonoBehaviour
         if (_dateText == null) return;
 
         string seasonKr = SeasonToKorean(season);
-        _dateText.text = $"{day}ÀÏ";
+        _dateText.text = $"{day}ì¼";
         _seasonText.text = seasonKr;
-        _yearText.text = $"{year}³âÂ÷";
+        _yearText.text = $"{year}ë…„";
     }
 
     string SeasonToKorean(Season s)
     {
         switch (s)
         {
-            case Season.Spring: return "º½";
-            case Season.Summer: return "¿©¸§";
-            case Season.Fall: return "°¡À»";
-            case Season.Winter: return "°Ü¿ï";
+            case Season.Spring: return "ë´„";
+            case Season.Summer: return "ì—¬ë¦„";
+            case Season.Fall: return "ê°€ì„";
+            case Season.Winter: return "ê²¨ìš¸";
         }
         return s.ToString();
     }
