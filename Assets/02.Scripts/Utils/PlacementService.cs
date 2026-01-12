@@ -54,7 +54,7 @@ public static class PlacementService
             tile.ClearOccupant();
         }
 
-        Vector3 pos = tile.transform.position + offset;
+        Vector3 pos = tile.transform.position;
         var inst = Object.Instantiate(prefab, pos, rotation, _worldRoot);
 
         var placed = EnsurePlacedObject(inst);
