@@ -274,6 +274,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3555117372030651396}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -4795606698281344694, guid: 40c157d1f354202449acc218645bc884, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2941477674717197756}
+    - targetCorrespondingSourceObject: {fileID: -4795606698281344694, guid: 40c157d1f354202449acc218645bc884, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1862650180638573675}
     - targetCorrespondingSourceObject: {fileID: -4287893037368246789, guid: 40c157d1f354202449acc218645bc884, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9084723336157581975}
@@ -328,6 +334,46 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: -1}
   m_TimeToStationary: 0.5
+--- !u!1 &4970545804862953630 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -4795606698281344694, guid: 40c157d1f354202449acc218645bc884, type: 3}
+  m_PrefabInstance: {fileID: 8757381479981316564}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2941477674717197756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4970545804862953630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d91bc3c950e3d5747804c3a4481dcde9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetSceneName: HouseScene
+  _targetSpawnId: HouseEntrance
+--- !u!65 &1862650180638573675
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4970545804862953630}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.33, y: 1, z: 1.51}
+  m_Center: {x: 0, y: 0.39, z: -0.01}
 --- !u!4 &9080032501793267263 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 40c157d1f354202449acc218645bc884, type: 3}

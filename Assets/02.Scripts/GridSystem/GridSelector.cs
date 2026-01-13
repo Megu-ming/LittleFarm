@@ -82,7 +82,6 @@ public class GridSelector : MonoBehaviour
         {
             Vector2 mousePos = Mouse.current.position.ReadValue();
             Ray ray = cam.ScreenPointToRay(mousePos);
-            Gizmos.DrawSphere(ray.origin, 0.1f);
             Gizmos.DrawRay(ray);
         }
     }
