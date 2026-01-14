@@ -10,7 +10,7 @@ public class DoorInteract : MonoBehaviour, IInteractable
     {
         if (string.IsNullOrEmpty(_targetSceneName))
         {
-            Debug.LogError("[DoorInteract::Interact] 대상 씬 이름이 설정되지 않았습니다.", this);
+            Debug.LogError("[DoorInteract::Interact] No Target Scene Name.", this);
             return;
         }
 

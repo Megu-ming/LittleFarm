@@ -126,7 +126,7 @@ public static class PlacementService
             }
         }
 
-        Vector3 pos = originTile.transform.position + offset;
+        Vector3 pos = originTile.transform.position;
         var inst = Object.Instantiate(prefab, pos, rotation, _worldRoot);
 
         var placed = EnsurePlacedObject(inst);

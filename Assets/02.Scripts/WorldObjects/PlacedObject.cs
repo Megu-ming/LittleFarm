@@ -23,6 +23,7 @@ public class PlacedObject : MonoBehaviour
     bool _rebuildScheduled;
 #endif
 
+    public Vector2Int Size => _footprintSize;
     public FarmTile OwnerTile => _ownerTile;
     public FarmTile[] OccupiedTiles => _occupiedTiles;
 

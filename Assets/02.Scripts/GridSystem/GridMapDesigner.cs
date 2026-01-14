@@ -1,3 +1,4 @@
+using System.Drawing;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -64,10 +65,35 @@ public class GridMapDesigner : MonoBehaviour
 
         Vector3 pos = tile.transform.position;
         pos.y += yOffset;
+        GameObject obj;
+        if (prefab.TryGetComponent<PlacedObject>(out PlacedObject po))
+        {
+            var size = po.Size;
+            if(size.magnitude > 1)
+            {
+                int blx = gx - (size.x / 2);
+                int blz = gz - (size.y / 2);
+                FarmTile[] tiles = new FarmTile[size.x * size.y];
+                int idx = 0;
 
-        // 에디터/플레이 둘 다에서 동작하도록 일반 Instantiate 사용
-        GameObject obj = PlacementService.PlaceOnTile(prefab, tile, pos, Quaternion.identity);
-        obj.name = $"{prefab.name}_({gx},{gz})";
+                for (int dx = 0; dx < size.x; dx++)
+                {
+                    for (int dz = 0; dz < size.y; dz++)
+                    {
+                        int tileX = blx + dx;
+                        int tileZ = blz + dz;
+                        tiles[idx++] = grid.GetTile(tileX, tileZ);
+                    }
+                }
+
+                obj = PlacementService.PlaceFootprint(prefab, tile, tiles, pos, Quaternion.identity);
+            }
+            else
+            {
+                obj = PlacementService.PlaceOnTile(prefab, tile, pos, Quaternion.identity);
+            }
+            obj.name = $"{prefab.name}_({gx},{gz})";
+        }
     }
 
     public void EraseAt(int gx, int gz)
