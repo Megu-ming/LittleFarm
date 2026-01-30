@@ -595,6 +595,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 3
   _rotationSpeed: 10
+  _animator: {fileID: 7535816961495815197}
+  _cc: {fileID: 23700768805769577}
 --- !u!114 &8096159823935397089
 MonoBehaviour:
   m_ObjectHideFlags: 0

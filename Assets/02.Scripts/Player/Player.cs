@@ -80,9 +80,12 @@ public class Player : MonoBehaviour
         UpdateHoldingAnimFlag();
     }
 
-    public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, QuickSlotUI quickSlotUI)
+    public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, QuickSlotUI quickSlotUI, GridSelector gridSelector, CropManager cropManager)
     {
-        _controller.Initialize(this, _characterController, _animator, _gridSelector);
+        _gridSelector = gridSelector;
+        _cropManager = cropManager;
+
+        _controller.Initialize(this, _gridSelector);
         _action.Initialize(this, _gridSelector, _animator);
         _interaction.Initialize(_gridSelector);
         _itemMagnet.Initialize(this);

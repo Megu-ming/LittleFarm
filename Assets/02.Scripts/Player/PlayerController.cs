@@ -11,18 +11,16 @@ public class PlayerController : MonoBehaviour
 
     // 참조
     Player _player;
-    Animator _animator;
-    CharacterController _cc;
+    [SerializeField] Animator _animator;
+    [SerializeField] CharacterController _cc;
     GridSelector _gridSeletor;
 
     Vector2 _moveInput;
     bool _isInitialized = false;
 
-    public void Initialize(Player player, CharacterController characterController, Animator animator, GridSelector gridSelector)
+    public void Initialize(Player player, GridSelector gridSelector)
     {
         _player = player;
-        _cc = characterController;
-        _animator = animator;
         _gridSeletor = gridSelector;
 
         _isInitialized = true;

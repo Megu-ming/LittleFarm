@@ -22,7 +22,7 @@ public class GridSelector : MonoBehaviour
     [SerializeField] float highlightYPos = 0.11f;
 
     [Header("타일 범위")]
-    [SerializeField] int maxRangeInTiles = 1;
+    [SerializeField] int maxRangeInTiles = 2;
 
     [SerializeField, ReadOnly]FarmTile _currentTile;
     GameObject _tileHighlightInstance;
@@ -192,49 +192,15 @@ public class GridSelector : MonoBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, interactMask))
             return false;
 
-        var target = hit.collider.GetComponentInParent<IInteractable>();
-        if (target == null)
-            return false;
-
-        // 3) PlacedObject + ownerTile 기준으로 거리 판정
-        var placed = hit.collider.GetComponentInParent<PlacedObject>();
-
-        // fallback용 월드 기준 위치 (ownerTile 없을 때)
-        Vector3 refPos = ((MonoBehaviour)target).transform.position;
-
-        if (placed != null && placed.OwnerTile != null)
+        if (hit.collider.TryGetComponent<IInteractable>(out var target))
         {
-            // 타일 기준 위치
-            refPos = placed.OwnerTile.transform.position;
-
-            if (grid != null &&
-                grid.WorldToGrid(playerPos, out int px, out int pz) &&
-                grid.WorldToGrid(refPos, out int tx, out int tz))
-            {
-                // 타일 좌표 기준 거리 (대각선 포함)
-                int dx = Mathf.Abs(tx - px);
-                int dz = Mathf.Abs(tz - pz);
-                int maxDelta = Mathf.Max(dx, dz);
-
-                // maxRangeInTiles 안에 있지 않으면 상호작용 불가
-                if (maxDelta > maxRangeInTiles)
-                    return false;
-            }
-            else
-            {
-                // 혹시 그리드 변환에 실패하면 월드 거리로 백업
-                float maxWorldDist = grid != null ? grid.cellSize * maxRangeInTiles : 1.5f;
-                if (Vector3.Distance(playerPos, refPos) > maxWorldDist)
-                    return false;
-            }
-        }
-        else
-        {
-            // PlacedObject/ownerTile이 없으면 예전 방식(월드 거리)으로 판정
-            float maxWorldDist = grid != null ? grid.cellSize * maxRangeInTiles : 1.5f;
-            if (Vector3.Distance(playerPos, refPos) > maxWorldDist)
+            Vector2 targetPos = new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z);
+            Vector2 playerPosxz = new Vector2(playerPos.x, playerPos.z);
+            var dist = Vector2.Distance(playerPosxz, targetPos);
+            if (dist > maxRangeInTiles)
                 return false;
         }
+        else return false;
 
         // 4) 여기까지 왔으면 유효한 상호작용 대상
         interactable = target;

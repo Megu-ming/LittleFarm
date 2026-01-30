@@ -64,7 +64,7 @@ public class GameInitializer : MonoBehaviour
         _inventoryUI.Initialize(_inventory, _database);
         _toolChangerUI.Initialize(_player);
         _quickSlotUI.Initialize(_player, _inventory, _database);
-        _player.Initialize(_inventoryUI, _toolChangerUI, _quickSlotUI);
+        _player.Initialize(_inventoryUI, _toolChangerUI, _quickSlotUI, _gridSelector, _cropManager);
 
         _timeManager.Initialize();
         _timeUI.Initialize(_timeManager);
