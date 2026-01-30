@@ -57,7 +57,7 @@ public class GameInitializer : MonoBehaviour
         PlacementService.Initialize(_worldRoot);
 
         _tgManager.Initialize();
-        _gridSelector.Initialize();
+        _gridSelector.Initialize(_player);
 
         _database.Initialize();
         _inventory.Initialize(_database);

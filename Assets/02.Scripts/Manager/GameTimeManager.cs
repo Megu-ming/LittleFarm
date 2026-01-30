@@ -39,7 +39,6 @@ public class GameTimeManager : MonoBehaviour
     public int DayStartHour => _dayStartHour;
     public int DayEndHour => _dayEndHour;
 
-
     /// <summary>오늘이 진행 가능한 시간대인지 (06:00 ~ 다음날 02:00)</summary>
     public bool IsPlayableTime
     {

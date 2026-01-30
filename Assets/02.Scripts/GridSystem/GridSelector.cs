@@ -10,7 +10,7 @@ public class GridSelector : MonoBehaviour
     [Header("참조")]
     [SerializeField] Camera cam;                // 사용할 카메라
     [SerializeField] GridManager grid;          // 그리드 정보
-    [SerializeField] Transform player; // 플레이어 위치
+    [SerializeField] Transform _player; // 플레이어 위치
 
     [Header("레이어 마스크")]
     [SerializeField] LayerMask tileMask;        // FarmTile이 붙어있는 타일 레이어
@@ -30,10 +30,11 @@ public class GridSelector : MonoBehaviour
     
     public FarmTile CurrentTile => _currentTile;
 
-    public void Initialize()
+    public void Initialize(Player player)
     {
         if (cam == null)
             cam = Camera.main;
+        _player = player.transform;
 
         if(tileHighlightPrefab!=null)
         {
@@ -60,7 +61,7 @@ public class GridSelector : MonoBehaviour
     {
         _currentTile = null;
 
-        if (!TryGetTileFromMouseDirection(player.position, out FarmTile tile))
+        if (!TryGetTileFromMouseDirection(_player.position, out FarmTile tile))
         {
             SetHighlightActive(false);
             return;
