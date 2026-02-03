@@ -49,7 +49,7 @@ public class StoneToolTarget : PlacedObject, IToolTarget, IInteractable
     /// </summary>
     private void DropItems()
     {
-        GameInitializer.Instance.DropItems
+        GameManager.Instance.ObjectManager.DropItems
             (_dropItemKey, transform.position, _dropOffset, _dropCountMin, _dropCountMax);
 
         Destroy(gameObject);

@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
     {
         if (index < 0 || index >= 10)
             return;
-
+        
         // 도구 상태(-1)에서 아이템으로 전환하면 도구 프롭 제거
         if (_hand == -1)
             ClearToolVisual();

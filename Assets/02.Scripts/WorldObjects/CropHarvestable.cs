@@ -13,7 +13,7 @@ public class CropHarvestable : PlacedObject, IToolTarget, IInteractable
 
     public void Interact(PlayerInteraction interactor)
     {
-        GameInitializer.Instance.DropItems(_cropItemKey, transform.position, _dropOffset);
+        GameManager.Instance.ObjectManager.DropItems(_cropItemKey, transform.position, _dropOffset);
 
         Destroy(gameObject);
     }

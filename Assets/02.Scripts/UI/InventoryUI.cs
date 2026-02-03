@@ -41,7 +41,7 @@ public class InventoryUI : MonoBehaviour
                 Destroy(_slotUIs[i].gameObject);
         }
 
-        int count = _inventory.SlotCount;
+        int count = Inventory._maxSlotCount;
         _slotUIs = new InventorySlotUI[count];
 
         for(int i=0;i<count;i++)

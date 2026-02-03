@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
     [Header("슬롯 설정")]
-    [SerializeField] int _maxSlotCount = 30;
+    public const int _maxSlotCount = 30;
     [SerializeField] int _initialUnlocked = 10;
     [SerializeField] ItemStack[] _slots;
 
     [Header("디버그 확인용")]
     [SerializeField] int _unlockedSlots;
 
-    public int SlotCount => _maxSlotCount;
     public IReadOnlyList<ItemStack> Slots => _slots;
     public int UnlockedSlots => _unlockedSlots;
 
@@ -25,6 +23,8 @@ public class Inventory : MonoBehaviour
 
     public void Initialize(ItemDatabase database)
     {
+        GameManager.Instance.DataManager.SetInventory(this);
+
         _database = database;
 
         if(_slots == null || _slots.Length != _maxSlotCount)
@@ -37,6 +37,8 @@ public class Inventory : MonoBehaviour
         }
 
         _unlockedSlots = Mathf.Clamp(_initialUnlocked, 0, _maxSlotCount);
+
+        LoadData();
     }
 
     public ItemStack GetSlot(int index)
@@ -216,7 +218,49 @@ public class Inventory : MonoBehaviour
             SlotChanged?.Invoke(toIndex);
             return true;
         }
-
     }
 
+    /// <summary>
+    /// 현재 인벤토리 상태를 저장용 데이터로 변환해서 반환하는 함수
+    /// </summary>
+    /// <returns></returns>
+    public InventorySaveData GetSaveData()
+    {
+        int[] itemIds = new int[_slots.Length];
+        int[] itemAmounts = new int[_slots.Length];
+        for(int i = 0; i < itemIds.Length; i++)
+        {
+            if (_slots[i].ItemId == -1) continue;
+
+            itemIds[i] = _slots[i].ItemId;
+            itemAmounts[i] = _slots[i].Count;
+        }
+
+        InventorySaveData data = new InventorySaveData(itemIds, itemAmounts);
+
+        return data;
+    }
+
+    private void LoadData()
+    {
+        InventorySaveData saveData = GameManager.Instance.DataManager.InventorySaveData;
+
+        IReadOnlyList<int> itemIds = saveData.ItemIds;
+
+        for (int i = 0; i < itemIds.Count; i++)
+        {
+            int itemId = itemIds[i];
+            if (itemId != -1)
+            {
+                var item = _database.GetById(itemId);
+                if (item == null)
+                {
+                    Debug.LogWarning($"존재하지 않는 아이템입니다.({itemId})");
+                    continue;
+                }
+                
+                TryAddItem(itemId, saveData.ItemAmounts[i], out int remainder);
+            }
+        }
+    }
 }
