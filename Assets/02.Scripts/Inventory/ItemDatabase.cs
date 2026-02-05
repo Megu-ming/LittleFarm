@@ -17,6 +17,7 @@ public class ItemDatabase : MonoBehaviour
 
     public void Initialize()
     {
+        _itemCsv = Resources.Load<TextAsset>("Data/ItemList");
         LoadFromCsv(_itemCsv.text);
 
         LinkIconSprites();                   // 아이콘 스프라이트 연결

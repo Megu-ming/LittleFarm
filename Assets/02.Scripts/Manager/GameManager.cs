@@ -20,11 +20,17 @@ public class GameManager : Singleton<GameManager>
         _objectManager = gameObject.GetOrAddComponent<ObjectManager>();
     }
 
+    /// <summary>
+    /// GameTimeManager의 ForceNextDay에서 데이터 저장
+    /// </summary>
     public void Save()
     {
         _dataManager.Save();
     }
 
+    /// <summary>
+    /// GameInitializer에서 Initialize할 때 데이터 불러오기
+    /// </summary>
     public void Load()
     {
         _dataManager.Load();

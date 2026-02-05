@@ -131,6 +131,8 @@ public class GameTimeManager : MonoBehaviour
         _minuteAccumulator = 0f;
 
         OnTimeChanged?.Invoke(_hour, _minute);
+
+        GameManager.Instance.Save();
     }
 
     void AdvanceDate()

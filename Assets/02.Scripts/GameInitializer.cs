@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class GameInitializer : MonoBehaviour
 {
-    private static GameInitializer instance;
-
     [Header("테스트용 임시")]
     [SerializeField] BuildingPlacer _buildingPlacer;
 
@@ -24,32 +22,11 @@ public class GameInitializer : MonoBehaviour
 
     [SerializeField] Transform _worldRoot;
 
-    public static GameInitializer Instance
-    {
-        get
-        {
-            if(instance == null)
-            {
-                return null;
-            }
-            return instance;
-        }
-    }
-
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-            Destroy(this.gameObject);
-    }
-
-    public void Initialize()
+    public void Start()
     {
         var gm = GameManager.Instance;
+        gm.Load();
+
         PlacementService.Initialize(_worldRoot);
 
         _tgManager.Initialize();

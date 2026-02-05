@@ -250,7 +250,7 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < itemIds.Count; i++)
         {
             int itemId = itemIds[i];
-            if (itemId != -1)
+            if (itemId != 0)
             {
                 var item = _database.GetById(itemId);
                 if (item == null)
