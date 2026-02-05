@@ -7,22 +7,36 @@ public class DataManager : MonoBehaviour
     [SerializeField] GameSaveData _gameSaveData;
     [SerializeField] ItemDatabase _itemDatabase;
 
+    Player _player;
     Inventory _inventory;
 
     public PlayerSaveData PlayerSaveData => _gameSaveData.PlayerSaveData;
     public InventorySaveData InventorySaveData => _gameSaveData.InventorySaveData;
     public ItemDatabase ItemDatabase => _itemDatabase;
 
+    public void SetPlayer(Player player)
+    {
+        _player = player;
+    }
+
     public void SetInventory(Inventory inventory)
     {
         _inventory = inventory;
     }
 
+    private void Awake()
+    {
+        _itemDatabase = gameObject.GetOrAddComponent<ItemDatabase>();
+        _itemDatabase.Initialize();
+    }
+
     public void Save()
     {
-        if (_inventory != null)
+        if (_player != null && _inventory != null)
         {
+            PlayerSaveData playerSaveData = _player.GetPlayerSaveData();
             InventorySaveData inventorySaveData = _inventory.GetSaveData();
+            _gameSaveData.SetPlayerData(playerSaveData);
             _gameSaveData.SetInventorySaveData(inventorySaveData);
         }
 

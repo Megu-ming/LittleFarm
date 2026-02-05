@@ -9,6 +9,9 @@ using UnityEngine.InputSystem.Controls;
 /// </summary>
 public class Player : MonoBehaviour
 {
+    [Header("세이브 데이터")]
+    [SerializeField] PlayerSaveData _playerSaveData;
+    
     [Header("외부 참조")]
     [SerializeField] GridSelector _gridSelector;
     [SerializeField] ToolChangerUI _toolChangerUI;
@@ -57,7 +60,6 @@ public class Player : MonoBehaviour
     // Hand 변경 애니메이션
     static readonly int IsHoldingHash = Animator.StringToHash("IsHolding");
 
-
     public void SetState(PlayerState state)
     {
         _currentState = state;
@@ -80,8 +82,12 @@ public class Player : MonoBehaviour
         UpdateHoldingAnimFlag();
     }
 
-    public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, QuickSlotUI quickSlotUI, GridSelector gridSelector, CropManager cropManager)
+    public void Initialize(InventoryUI inventoryUI, ToolChangerUI toolChangerUI, 
+        QuickSlotUI quickSlotUI, GridSelector gridSelector, CropManager cropManager)
     {
+        GameManager.Instance.DataManager.SetPlayer(this);
+        _playerSaveData = GameManager.Instance.DataManager.PlayerSaveData;
+
         _gridSelector = gridSelector;
         _cropManager = cropManager;
 
@@ -99,6 +105,8 @@ public class Player : MonoBehaviour
 
         RefreshHandItemProp();
         UpdateHoldingAnimFlag();
+
+        LoadFromData();
     }
 
     private void Update()
@@ -404,5 +412,18 @@ public class Player : MonoBehaviour
         }
 
         _animator.SetBool(IsHoldingHash, isHolding);
+    }
+
+    void LoadFromData()
+    {
+        transform.position = _playerSaveData.Position;
+        transform.rotation = _playerSaveData.Rotation;
+    }
+
+    public PlayerSaveData GetPlayerSaveData()
+    {
+        _playerSaveData.SetPlayerTransform(transform.position, transform.rotation);
+
+        return _playerSaveData;
     }
 }
